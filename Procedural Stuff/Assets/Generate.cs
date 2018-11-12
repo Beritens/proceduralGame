@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.Threading;
-
+using MarchingCubesProject;
 using ProceduralNoiseProject;
 
-namespace MarchingCubesProject
-{
+//namespace MarchingCubesProject
+//{
 
     public enum MARCHING_MODE {  CUBES, TETRAHEDRON };
 
@@ -41,6 +41,7 @@ namespace MarchingCubesProject
         List<Vector3Int> generatedChunks = new List<Vector3Int>();
         Vector3Int lastPlayerChunk;
         List<Action> FunctionsToRunInMainThread = new List<Action>();
+        List<Action> FunctionsToRunInMainThread2 = new List<Action>();
         
         
         [Space(10)]
@@ -53,7 +54,8 @@ namespace MarchingCubesProject
         //public Color[] colors;
         [Space(10)]
         [Header("sculpt stuff")]
-        bool cansculpt = true;
+        sculpting sculp;
+        bool canGenSculp;
         
     
         void Start()
@@ -70,6 +72,7 @@ namespace MarchingCubesProject
             //fractal = new FractalNoise(perlin, 3, 1.0f);
             fractal = new FractalNoise(perlin, fractalOctaves, fractalfrequency, fractalamplitude);
             cS = (int)((float)chunkSize*resolution)+overlap;
+            sculp = new sculpting(cam,chunkSize,voxelsPerChunk,overlap);
             
             
 
@@ -77,7 +80,7 @@ namespace MarchingCubesProject
         }
         int cS;
 
-        void GenerateTerrain(Vector3Int terrainOffset)
+        void GenerateTerrain(Vector3Int terrainOffset, bool scu, bool end)
         {
             Marching marching = null;
             if(mode == MARCHING_MODE.TETRAHEDRON)
@@ -130,68 +133,90 @@ namespace MarchingCubesProject
             //A mesh in unity can only be made up of 65000 verts.
             //Need to split the verts between multiple meshes.
 
-            int maxVertsPerMesh = 30000; //must be divisible by 3, ie 3 verts == 1 triangle
-            int numMeshes = verts.Count / maxVertsPerMesh + 1;
+            // int maxVertsPerMesh = 50000; //must be divisible by 3, ie 3 verts == 1 triangle
+            // int numMeshes = verts.Count / maxVertsPerMesh + 1;
 
-            for (int i = 0; i < numMeshes; i++)
-            {
+            // for (int i = 0; i < numMeshes; i++)
+            // {
 
-                List<Vector3> splitVerts = new List<Vector3>();
-                List<int> splitIndices = new List<int>();
-                List<Vector3> ores = new List<Vector3>();
-                for (int j = 0; j < maxVertsPerMesh; j++)
-                {
-                    int idx = i * maxVertsPerMesh + j;
+    //      List<Vector3> splitVerts = new List<Vector3>();
+            
+    //      List<Vector3> ores = new List<Vector3>();
+            
+    //     for (int j = 0; j < maxVertsPerMesh; j++)
+    //     {
+    //         int idx = i * maxVertsPerMesh + j;
 
-                    if (idx < verts.Count)
-                    {
+    //         if (idx < verts.Count)
+    //         {
 
-                        splitVerts.Add(verts[idx]/resolution);
-                        splitIndices.Add(j);
-                    }
+    //             splitVerts.Add(verts[idx]/resolution);
+    //             splitIndices.Add(j);
+    //         }
+    //     }
+            // for(int i = 0; i< verts.Count; i++){
+            //     verts[i] = verts[i]/resolution;
+            // }
+            List<int> splitIndices = new List<int>();
+            for(int i = 0; i< verts.Count; i++){
+                verts[i]= verts[i]/resolution;
+                
+                splitIndices.Add(i);
+            }
+            
+            if (verts.Count == 0) return;
+            Action generateMesh = () => {
+                /*UnityEngine.Random.InitState((int)(terrainOffset.x+terrainOffset.y+terrainOffset.z+seed));
+                if(UnityEngine.Random.value <= probability && ore != null){
+                    int verty = UnityEngine.Random.Range(0,splitVerts.Count-1);
+                    //Debug.Log(splitVerts[verty]+terrainOffset);
+                    Vector3 orePos = splitVerts[verty]+terrainOffset+Container.position;
+                    GameObject.Instantiate(ore,orePos,Quaternion.identity,Container);
+                }*/
+                Mesh mesh = new Mesh();
+                mesh.SetVertices(verts);
+                mesh.SetTriangles(splitIndices, 0);
+                mesh.RecalculateBounds();
+                mesh.RecalculateNormals();
+
+                GameObject go = new GameObject("Mesh");
+                go.transform.parent = transform;
+                go.AddComponent<MeshFilter>();
+                go.AddComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                go.GetComponent<Renderer>().material = m_material;
+                go.GetComponent<MeshFilter>().mesh = mesh;
+                
+                //if(splitVerts.Count > 30)
+                go.AddComponent<MeshCollider>();
+                    
+                    
+                go.transform.localPosition = new Vector3(/*-w / 2 / resolution+*/terrainOffset.x, /*-h / 2 / resolution+*/terrainOffset.y,/* -l / 2 / resolution+*/terrainOffset.z);
+                if(meshes.ContainsKey(terrainOffset)){
+                    Destroy(meshes[terrainOffset]);
+                    meshes[terrainOffset]=go;
+                    
+                }
+                else{
+                    meshes.Add(terrainOffset,go);
                 }
                 
-                if (splitVerts.Count == 0) continue;
-                Action generateMesh = () => {
-                    /*UnityEngine.Random.InitState((int)(terrainOffset.x+terrainOffset.y+terrainOffset.z+seed));
-                    if(UnityEngine.Random.value <= probability && ore != null){
-                        int verty = UnityEngine.Random.Range(0,splitVerts.Count-1);
-                        //Debug.Log(splitVerts[verty]+terrainOffset);
-                        Vector3 orePos = splitVerts[verty]+terrainOffset+Container.position;
-                        GameObject.Instantiate(ore,orePos,Quaternion.identity,Container);
-                    }*/
-                    Mesh mesh = new Mesh();
-                    mesh.SetVertices(splitVerts);
-                    mesh.SetTriangles(splitIndices, 0);
-                    mesh.RecalculateBounds();
-                    mesh.RecalculateNormals();
-
-                    GameObject go = new GameObject("Mesh");
-                    go.transform.parent = transform;
-                    go.AddComponent<MeshFilter>();
-                    MeshRenderer renderer = go.AddComponent<MeshRenderer>();
-                    renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-
-                    go.GetComponent<Renderer>().material = m_material;
-                    go.GetComponent<MeshFilter>().mesh = mesh;
-                    //if(splitVerts.Count > 30)
-                        go.AddComponent<MeshCollider>();
-                        
-                        
-                    go.transform.localPosition = new Vector3(/*-w / 2 / resolution+*/terrainOffset.x, /*-h / 2 / resolution+*/terrainOffset.y,/* -l / 2 / resolution+*/terrainOffset.z);
-                    if(meshes.ContainsKey(terrainOffset)){
-                        Destroy(meshes[terrainOffset]);
-                        meshes[terrainOffset]=go;
-                        cansculpt = true;
-                    }
-                    else{
-                        meshes.Add(terrainOffset,go);
-                    }
-                    
-                };
                 
-                QueueMainThreadFunction(generateMesh);
+            };
+            if(scu){
+                
+                if(end){
+                    canGenSculp = true;
+                }
+                else if(FunctionsToRunInMainThread2.Count == 0){
+                    canGenSculp = false;
+                }
+                FunctionsToRunInMainThread2.Add(generateMesh);
             }
+            else{
+                FunctionsToRunInMainThread.Add(generateMesh);
+            }
+            
+            //}
 
         }
 
@@ -275,6 +300,17 @@ namespace MarchingCubesProject
                 }
                 
             }
+            if(canGenSculp){
+                while(FunctionsToRunInMainThread2.Count > 0){
+                    Action func = FunctionsToRunInMainThread2[0];
+                    FunctionsToRunInMainThread2.RemoveAt(0);
+                    if(func != null){
+                        func();
+                    }
+                    
+                }
+            }
+            
             Vector3Int playerChunk = Chunk(Player.localPosition);
             if(oldChunks != null){
                 for(int i = 0; i< oldChunks.Count; i++){
@@ -322,19 +358,20 @@ namespace MarchingCubesProject
 
                 }
             }
-            sculpt();
             
+            sculpt();
             lastPlayerChunk = playerChunk;
             
 
         }
+        Thread Sthread;
         void sculpt(){
             if(Cursor.lockState == CursorLockMode.None){
                 return;
             }
-            if((Input.GetButton("Fire1") || Input.GetButton("Fire2")) && cansculpt){
-				float multi = 1;
-				if(Input.GetButton("Fire2"))
+            if((Input.GetButton("Fire1") || Input.GetButton("Fire2")) && (Sthread == null || !Sthread.IsAlive)){
+				int multi = 1;
+				if(Input.GetButton("Fire1"))
 					multi = -1;
 				RaycastHit hit;
         		Ray ray = cam.ScreenPointToRay(new Vector2(Screen.width/2,Screen.height/2));
@@ -342,85 +379,87 @@ namespace MarchingCubesProject
 				if(Physics.Raycast(ray, out hit)){
 					if(hit.transform.parent.tag == "holder"){
 						Vector3 pos = transform.InverseTransformPoint(hit.point)-hit.normal*multi;
-                        Vector3Int chunk= Chunk(pos)*(chunkSize/*-overlap/*2*/);
-                        List<Vector3Int> chunks = new List<Vector3Int>();
-                        chunks.Add(chunk);
-                        //Debug.Log(chunk);
-						//pos = pos- hit.normal;
-						int _x = Mathf.FloorToInt((pos.x-chunk.x)*resolution);
-                        
-						int _y = Mathf.FloorToInt((pos.y-chunk.y)*resolution);
-						int _z = Mathf.FloorToInt((pos.z-chunk.z)*resolution);
-						//int idx = x+ y*chunkSize + z*chunkSize*chunkSize;
-						for(int x = _x-2; x<= _x+2; x++){
-							for(int y = _y-2; y<= _y+2; y++){
-								for(int z = _z-2; z<= _z+2; z++){
-									
-                                    float distancevox = Vector3.Distance(pos-chunk,new Vector3(x,y,z)/resolution);
-                                    float change = Mathf.Max(0.02f*(-0.1f*Mathf.Pow(distancevox,2)+1f),0)*multi;
-                                    
-									if(!(x<0 || y<0 || z<0 || x>=voxelsPerChunk || y>=voxelsPerChunk || z>=voxelsPerChunk)){
-                                        int idx = x+ y*cS + z*cS*cS;
-										float vox = Mathf.Clamp(voxels[chunk][idx]-change,-1,1);
-                                        //Debug.Log(Mathf.Max(0.05f*(-0.1f*Mathf.Pow(distancevox,2)+1f)+100f,0));
-										voxels[chunk][idx] = vox;
-                                        bool ox = x< overlap;
-                                        bool oy = y< overlap;
-                                        bool oz = z< overlap;
-                                        if(ox || oy || oz){
-                                            List<Vector3Int> thisChunks = new List<Vector3Int>();
-                                            if(ox){
-                                                thisChunks.Add(chunk - Vector3Int.right* (chunkSize));
-                                                if(oy){
-                                                    thisChunks.Add(chunk - new Vector3Int(1,1,0)* (chunkSize));
-                                                    if(oz){
-                                                        thisChunks.Add(chunk - new Vector3Int(1,1,1)* (chunkSize));
-                                                    }   
-                                                }  
-                                                if(oz){
-                                                    thisChunks.Add(chunk - new Vector3Int(1,0,1)* (chunkSize));
-                                                }    
-                                            }
-                                             if(oy){
-                                                thisChunks.Add(chunk - Vector3Int.up* (chunkSize));
-                                                if(oz){
-                                                    thisChunks.Add(chunk - new Vector3Int(0,1,1)* (chunkSize));
-                                                }
-                                            }
-                                             if(oz){
-                                                thisChunks.Add(chunk - new Vector3Int(0,0,1)* (chunkSize));
-                                            }
-                                            
-                                            for(int i = 0; i< thisChunks.Count;i++){
-                                                SchangeVoxels(change,chunk,thisChunks[i],x,y,z);
-                                                if(!chunks.Contains(thisChunks[i])){
-                                                    chunks.Add(thisChunks[i]);
-                                                }
-                                            }
-                                            
+                        // Vector3Int chunk= Chunk(pos)*(chunkSize/*-overlap/*2*/);
+                        // if(voxels.ContainsKey(chunk)){
+                        //     List<Vector3Int> chunks = new List<Vector3Int>();
+                        //     chunks.Add(chunk);
+                        //     //Debug.Log(chunk);
+                        //     //pos = pos- hit.normal;
+                        //     int _x = Mathf.FloorToInt((pos.x-chunk.x)*resolution);
+                            
+                        //     int _y = Mathf.FloorToInt((pos.y-chunk.y)*resolution);
+                        //     int _z = Mathf.FloorToInt((pos.z-chunk.z)*resolution);
+                        //     //int idx = x+ y*chunkSize + z*chunkSize*chunkSize;
+                        //     for(int x = _x-2; x<= _x+2; x++){
+                        //         for(int y = _y-2; y<= _y+2; y++){
+                        //             for(int z = _z-2; z<= _z+2; z++){
+                                        
+                        //                 float distancevox = Vector3.Distance(pos-chunk,new Vector3(x,y,z)/resolution);
+                        //                 float change = Mathf.Max(0.02f*(-0.1f*Mathf.Pow(distancevox,2)+1f),0)*multi;
+                                        
+                        //                 if(!(x<0 || y<0 || z<0 || x>=voxelsPerChunk || y>=voxelsPerChunk || z>=voxelsPerChunk)){
+                        //                     int idx = x+ y*cS + z*cS*cS;
+                        //                     float vox = Mathf.Clamp(voxels[chunk][idx]+change,-1,1);
+                        //                     //Debug.Log(Mathf.Max(0.05f*(-0.1f*Mathf.Pow(distancevox,2)+1f)+100f,0));
+                        //                     voxels[chunk][idx] = vox;
+                        //                     bool ox = x< overlap;
+                        //                     bool oy = y< overlap;
+                        //                     bool oz = z< overlap;
+                        //                     if(ox || oy || oz){
+                        //                         List<Vector3Int> thisChunks = new List<Vector3Int>();
+                        //                         if(ox){
+                        //                             thisChunks.Add(chunk - Vector3Int.right* (chunkSize));
+                        //                             if(oy){
+                        //                                 thisChunks.Add(chunk - new Vector3Int(1,1,0)* (chunkSize));
+                        //                                 if(oz){
+                        //                                     thisChunks.Add(chunk - new Vector3Int(1,1,1)* (chunkSize));
+                        //                                 }   
+                        //                             }  
+                        //                             if(oz){
+                        //                                 thisChunks.Add(chunk - new Vector3Int(1,0,1)* (chunkSize));
+                        //                             }    
+                        //                         }
+                        //                         if(oy){
+                        //                             thisChunks.Add(chunk - Vector3Int.up* (chunkSize));
+                        //                             if(oz){
+                        //                                 thisChunks.Add(chunk - new Vector3Int(0,1,1)* (chunkSize));
+                        //                             }
+                        //                         }
+                        //                         if(oz){
+                        //                             thisChunks.Add(chunk - new Vector3Int(0,0,1)* (chunkSize));
+                        //                         }
+                                                
+                        //                         for(int i = 0; i< thisChunks.Count;i++){
+                        //                             SchangeVoxels(change,chunk,thisChunks[i],x,y,z);
+                        //                             if(!chunks.Contains(thisChunks[i])){
+                        //                                 chunks.Add(thisChunks[i]);
+                        //                             }
+                        //                         }
+                                                
 
-                                        }
-									}
-                                    else{
-                                        List<Vector3Int> thisChunks = getChunksfromVoxel(x,y,z,chunk);
-                                        for(int i = 0; i< thisChunks.Count;i++){
-                                            SchangeVoxels(change,chunk,thisChunks[i],x,y,z);
-                                            if(!chunks.Contains(thisChunks[i])){
-                                                chunks.Add(thisChunks[i]);
-                                            }
-                                        }
-                                    }
-								}
-							}	
-						}
-					
-						/*if(voxels.chunkSize > idx && idx>= 0)
-							voxels[idx] -= 1f;	*/			
-							
-						
-						Thread t = new Thread(() => GTL(chunks));
-						t.Start();
-						cansculpt = false;
+                        //                     }
+                        //                 }
+                        //                 else{
+                        //                     List<Vector3Int> thisChunks = getChunksfromVoxel(x,y,z,chunk);
+                        //                     for(int i = 0; i< thisChunks.Count;i++){
+                        //                         SchangeVoxels(change,chunk,thisChunks[i],x,y,z);
+                        //                         if(!chunks.Contains(thisChunks[i])){
+                        //                             chunks.Add(thisChunks[i]);
+                        //                         }
+                        //                     }
+                        //                 }
+                        //             }
+                        //         }	
+                        //     }
+                        
+                            /*if(voxels.chunkSize > idx && idx>= 0)
+                                voxels[idx] -= 1f;	*/			
+                                
+                            
+                            Sthread = new Thread(() => GTL(sculp.sculpt(ref voxels,multi,pos)));
+                            Sthread.Start();
+                        
+                        
 					}
 				}
 			}
@@ -428,73 +467,72 @@ namespace MarchingCubesProject
 
         void GTL(List<Vector3Int> chunks){
             for(int i = 0; i< chunks.Count; i++){
-                GenerateTerrain(chunks[i]);
+                GenerateTerrain(chunks[i],true,i==chunks.Count-1);
             }
         }
-        List<Vector3Int> getChunksfromVoxel(int x, int y, int z, Vector3Int chunk){
-            List<Vector3Int> chunks = new List<Vector3Int>();
-            Vector3Int chunky = new Vector3Int(Mathf.FloorToInt((chunk.x+(float)x/resolution)/chunkSize+0.001f)*chunkSize,Mathf.FloorToInt((chunk.y+(float)y/resolution)/chunkSize+0.001f)*chunkSize,Mathf.FloorToInt((chunk.z+(float)z/resolution)/chunkSize+0.001f)*chunkSize);
-            chunks.Add(chunky);
-            Vector3Int dif = chunk-chunky;
-            bool ox= (x+(int)(dif.x*resolution))<overlap;
-            bool oy= (y+(int)(dif.y*resolution))<overlap;
-            bool oz= (z+(int)(dif.z*resolution))<overlap;
-            //Debug.Log(x + " " + y + " "+z);
-            // if(x== 16){
-            //     //print(chunky + " "+ chunk.x+" "+ x+" "+chunkSize+" "+(-20f+16f/0.8f)/20f+ " "+ (chunk.x+(float)x/resolution)/chunkSize);
-            //     //print("why?  "+ (-20f+16f/0.8f)/20f + " -20f+16f/0.8f= " + (-20f+16f/0.8f));
-            // }
-            if(ox){
-                chunks.Add(chunky-Vector3Int.right*chunkSize);
+        // List<Vector3Int> getChunksfromVoxel(int x, int y, int z, Vector3Int chunk){
+        //     List<Vector3Int> chunks = new List<Vector3Int>();
+        //     Vector3Int chunky = new Vector3Int(Mathf.FloorToInt((chunk.x+(float)x/resolution)/chunkSize+0.001f)*chunkSize,Mathf.FloorToInt((chunk.y+(float)y/resolution)/chunkSize+0.001f)*chunkSize,Mathf.FloorToInt((chunk.z+(float)z/resolution)/chunkSize+0.001f)*chunkSize);
+        //     chunks.Add(chunky);
+        //     Vector3Int dif = chunk-chunky;
+        //     bool ox= (x+(int)(dif.x*resolution))<overlap;
+        //     bool oy= (y+(int)(dif.y*resolution))<overlap;
+        //     bool oz= (z+(int)(dif.z*resolution))<overlap;
+        //     //Debug.Log(x + " " + y + " "+z);
+        //     // if(x== 16){
+        //     //     //print(chunky + " "+ chunk.x+" "+ x+" "+chunkSize+" "+(-20f+16f/0.8f)/20f+ " "+ (chunk.x+(float)x/resolution)/chunkSize);
+        //     //     //print("why?  "+ (-20f+16f/0.8f)/20f + " -20f+16f/0.8f= " + (-20f+16f/0.8f));
+        //     // }
+        //     if(ox){
+        //         chunks.Add(chunky-Vector3Int.right*chunkSize);
                 
-                if(oy){
-                    chunks.Add(chunky-new Vector3Int(1,1,0)*chunkSize);
-                    if(oz){
-                        chunks.Add(chunky-new Vector3Int(1,1,1)*chunkSize);
-                    }
-                }
-                if(oz){
-                    chunks.Add(chunky-new Vector3Int(1,0,1)*chunkSize);
-                }
-            }
-            if(oy){
-                chunks.Add(chunky-Vector3Int.up*chunkSize);
-                if(oz){
-                    chunks.Add(chunky-new Vector3Int(0,1,1)*chunkSize);
-                }
-            }
-            if(oz){
-                chunks.Add(chunky-new Vector3Int(0,0,1)*chunkSize);
-            }
+        //         if(oy){
+        //             chunks.Add(chunky-new Vector3Int(1,1,0)*chunkSize);
+        //             if(oz){
+        //                 chunks.Add(chunky-new Vector3Int(1,1,1)*chunkSize);
+        //             }
+        //         }
+        //         if(oz){
+        //             chunks.Add(chunky-new Vector3Int(1,0,1)*chunkSize);
+        //         }
+        //     }
+        //     if(oy){
+        //         chunks.Add(chunky-Vector3Int.up*chunkSize);
+        //         if(oz){
+        //             chunks.Add(chunky-new Vector3Int(0,1,1)*chunkSize);
+        //         }
+        //     }
+        //     if(oz){
+        //         chunks.Add(chunky-new Vector3Int(0,0,1)*chunkSize);
+        //     }
             
 
-            return chunks;
-        }
-        void SchangeVoxels(float change, Vector3Int chunk, Vector3Int thisChunk, int x, int y, int z){
-            if(voxels.ContainsKey(thisChunk)){
-                Vector3Int dif = chunk-thisChunk;
-                int newidx = (x+(int)(dif.x*resolution))+ (y+(int)(dif.y*resolution))*cS + (z+(int)(dif.z*resolution))*cS*cS;
-                //Debug.Log(x+(int)(dif.x*resolution) + " " + (z+(int)(dif.z*resolution)));
-                // if(x+(int)(dif.x*resolution) == x)
-                //     Debug.Log(x+(int)(dif.x*resolution) + " " +y+(int)(dif.y*resolution)+ " " + (z+(int)(dif.z*resolution)));
-                voxels[thisChunk][newidx]=  Mathf.Clamp(voxels[thisChunk][newidx]-change,-1,1);
+        //     return chunks;
+        // }
+        // void SchangeVoxels(float change, Vector3Int chunk, Vector3Int thisChunk, int x, int y, int z){
+        //     if(voxels.ContainsKey(thisChunk)){
+        //         Vector3Int dif = chunk-thisChunk;
+        //         int newidx = (x+(int)(dif.x*resolution))+ (y+(int)(dif.y*resolution))*cS + (z+(int)(dif.z*resolution))*cS*cS;
+        //         //Debug.Log(x+(int)(dif.x*resolution) + " " + (z+(int)(dif.z*resolution)));
+        //         // if(x+(int)(dif.x*resolution) == x)
+        //         //     Debug.Log(x+(int)(dif.x*resolution) + " " +y+(int)(dif.y*resolution)+ " " + (z+(int)(dif.z*resolution)));
+        //         voxels[thisChunk][newidx]=  Mathf.Clamp(voxels[thisChunk][newidx]+change,-1,1);
                 
-            }  
-        }
+        //     }  
+        // }
         bool resetPos = false;
         void FixedUpdate()
         {
             if(resetPos){
                 Container.position = Player.localPosition * -1;
             }
+            
         }
         //chunk: x=1 y=1 z=1
-        Vector3Int Chunk(Vector3 pos){
+        public Vector3Int Chunk(Vector3 pos){
             return new Vector3Int(Mathf.FloorToInt(pos.x/(chunkSize/*-overlap/*2*/)),Mathf.FloorToInt(pos.y/(chunkSize/*-overlap/*2*/)),Mathf.FloorToInt(pos.z/(chunkSize/*-overlap/*2*/)));
         }
-        public void QueueMainThreadFunction(Action someFunc){
-            FunctionsToRunInMainThread.Add(someFunc);
-        }
+        
         void GenerateAllChunks(Vector3 PlayerPos){
             Vector3 playerChunk  = Chunk(PlayerPos);
             for(int x = (int)playerChunk.x-GenerateDistance;x<= (int)playerChunk.x+GenerateDistance;x++){
@@ -503,7 +541,7 @@ namespace MarchingCubesProject
                         currentChunks.Add(new Vector3Int(x,y,z));
                         if(!generatedChunks.Contains(new Vector3Int(x,y,z))){
                             generatedChunks.Add(new Vector3Int(x,y,z));
-                            GenerateTerrain(new Vector3Int(x*(chunkSize/*-overlap/*2*/),y*(chunkSize/*-overlap/*2*/),z*(chunkSize/*-overlap/*2*/)));
+                            GenerateTerrain(new Vector3Int(x*(chunkSize/*-overlap/*2*/),y*(chunkSize/*-overlap/*2*/),z*(chunkSize/*-overlap/*2*/)),false,false);
                             
                             //Thread t = new Thread(() => GenerateTerrain(new Vector3(x*(chunkSize-overlap*2),y*(chunkSize-overlap*2),z*(chunkSize-overlap*2))));
                             //t.Start();
@@ -587,4 +625,4 @@ namespace MarchingCubesProject
     }
     
 
-}
+///}

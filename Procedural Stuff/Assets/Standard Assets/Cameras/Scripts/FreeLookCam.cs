@@ -50,12 +50,16 @@ namespace UnityStandardAssets.Cameras
                 Cursor.lockState = m_LockCursor ? CursorLockMode.Locked : CursorLockMode.None;
                 Cursor.visible = !m_LockCursor;
             }*/
+            
+        }
+        void OnGUI()
+        {
             if(Input.GetButtonDown("Cancel")){
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
             else if(m_LockCursor && Input.anyKeyDown && !mouseOverUI()){
-                Cursor.lockState = m_LockCursor ? CursorLockMode.Locked : CursorLockMode.None;
+                Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = !m_LockCursor;
             }
         }
