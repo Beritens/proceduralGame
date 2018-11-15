@@ -4,7 +4,7 @@ using UnityEngine;
 using MarchingCubesProject;
 using System.Threading;
 
-public class sculpting : MonoBehaviour {
+public class sculpting{
 
 	Camera cam;
     int chunkSize;
@@ -12,15 +12,16 @@ public class sculpting : MonoBehaviour {
     float resolution;
     int overlap;
     int cS;
-    public sculpting(Camera camy, int chunkSizy, int voxelsPerChunky, int overlapy){
-        cam = camy;
-        chunkSize = chunkSizy;
-        voxelsPerChunk = voxelsPerChunky;
-        overlap = overlapy;
-        resolution = (float)voxelsPerChunk/chunkSize;
-        cS = (int)((float)chunkSize*resolution)+overlap;
+    //float max;
+    public sculpting(Camera cam, int chunkSize, int voxelsPerChunk, int overlap){
+        this.cam = cam;
+        this.chunkSize = chunkSize;
+        this.voxelsPerChunk = voxelsPerChunk;
+        this.overlap = overlap;
+        this.resolution = (float)voxelsPerChunk/chunkSize;
+        this.cS = (int)((float)chunkSize*resolution)+overlap;
     }
-    public List<Vector3Int> sculpt(ref Dictionary<Vector3Int,float[]> voxels, int multi,Vector3 pos){
+    public List<Vector3Int> sculpt(ref Dictionary<Vector3Int,float[]> voxels, int multi,Vector3 pos, Vector3 playerPos){
         
         
                 Vector3Int chunk= Chunk(pos)*(chunkSize/*-overlap/*2*/);
@@ -39,11 +40,23 @@ public class sculpting : MonoBehaviour {
                             for(int z = _z-2; z<= _z+2; z++){
                                 
                                 float distancevox = Vector3.Distance(pos-chunk,new Vector3(x,y,z)/resolution);
-                                float change = Mathf.Max(0.02f*(-0.1f*Mathf.Pow(distancevox,2)+1f),0)*multi;
+                                
+                                
+                                //float factor = Mathf.Clamp((distanceplayer-0.5f)/3f,0,1);
+                                
+                                float change = Mathf.Max(0.02f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi;
+                                if( multi == -1){
+                                    float distanceplayer = Vector3.Distance(new Vector3(x,y,z)/resolution+chunk,playerPos);
+                                    if(distanceplayer<2){
+                                        change = 0;
+                                    }
+                                    
+                                }
                                 
                                 if(!(x<0 || y<0 || z<0 || x>=voxelsPerChunk || y>=voxelsPerChunk || z>=voxelsPerChunk)){
                                     int idx = x+ y*cS + z*cS*cS;
                                     float vox = Mathf.Clamp(voxels[chunk][idx]+change,-1,1);
+                                    //clamp -1 and 1 maybe
                                     //Debug.Log(Mathf.Max(0.05f*(-0.1f*Mathf.Pow(distancevox,2)+1f)+100f,0));
                                     voxels[chunk][idx] = vox;
                                     bool ox = x< overlap;
@@ -157,12 +170,15 @@ public class sculpting : MonoBehaviour {
     }
     void SchangeVoxels(ref Dictionary<Vector3Int,float[]>voxels,float change, Vector3Int chunk, Vector3Int thisChunk, int x, int y, int z){
         if(voxels.ContainsKey(thisChunk)){
+            
             Vector3Int dif = chunk-thisChunk;
             int newidx = (x+(int)(dif.x*resolution))+ (y+(int)(dif.y*resolution))*cS + (z+(int)(dif.z*resolution))*cS*cS;
+            
             //Debug.Log(x+(int)(dif.x*resolution) + " " + (z+(int)(dif.z*resolution)));
             // if(x+(int)(dif.x*resolution) == x)
             //     Debug.Log(x+(int)(dif.x*resolution) + " " +y+(int)(dif.y*resolution)+ " " + (z+(int)(dif.z*resolution)));
-            voxels[thisChunk][newidx]=  Mathf.Clamp(voxels[thisChunk][newidx]+change,-1,1);
+            float vox=  Mathf.Clamp(voxels[thisChunk][newidx]+change,-1,1);
+            voxels[thisChunk][newidx] = vox;
             
         }  
     }
