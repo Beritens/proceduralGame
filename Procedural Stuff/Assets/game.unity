@@ -18,7 +18,7 @@ RenderSettings:
   m_FogColor: {r: 0.58762014, g: 0.816103, b: 0.8962264, a: 1}
   m_FogMode: 1
   m_FogDensity: 0.035
-  m_LinearFogStart: 20
+  m_LinearFogStart: 25
   m_LinearFogEnd: 45
   m_AmbientSkyColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_AmbientEquatorColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
@@ -7096,7 +7096,7 @@ MonoBehaviour:
   chunkSize: 20
   scale: 20
   surface: 0
-  voxelsPerChunk: 16
+  voxelsPerChunk: 15
   GenerateDistance: 2
   overlap: 1
   delDistance: 100

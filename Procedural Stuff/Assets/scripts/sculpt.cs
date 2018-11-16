@@ -20,7 +20,7 @@ namespace MarchingCubesProject
 		public Camera cam;
 
         List<GameObject> meshes = new List<GameObject>();
-		float[] voxels = null;
+		public float[] voxels = null;
 		public int width = 32;
 		public int height = 32;
 		public int length = 32;
@@ -71,7 +71,7 @@ namespace MarchingCubesProject
 						{
 							float voxel = 0;
 							float distance = Vector3.Distance(new Vector3(x,y,z),new Vector3((float)width/2,(float)height/2,(float)length/2));
-							voxel = -(5/distance)*2-1;
+							voxel = -((5/distance)*2-1);
 							float fx = x;
 							float fy = y;
 							float fz = z;
@@ -179,7 +179,7 @@ namespace MarchingCubesProject
 									int idx = x+ y*width + z*width*height;
 									if(x>0 && y> 0 && z > 0 && x<width-1 && y < height-1 && z < length-1){
 										float distancevox = Vector3.Distance(pos,new Vector3(x,y,z));
-										voxels[idx] = Mathf.Clamp(voxels[idx]-Mathf.Max(0.5f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi,-1,1);
+										voxels[idx] = Mathf.Clamp(voxels[idx]-Mathf.Max(0.02f*(0.5f*(-0.05f*Mathf.Pow(distancevox,2)+1f)),0)*multi,-1,1);
 									}
 								}
 							}	

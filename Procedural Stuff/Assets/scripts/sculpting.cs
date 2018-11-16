@@ -12,16 +12,17 @@ public class sculpting{
     float resolution;
     int overlap;
     int cS;
-    //float max;
-    public sculpting(Camera cam, int chunkSize, int voxelsPerChunk, int overlap){
+    float max;
+    public sculpting(Camera cam, int chunkSize, int voxelsPerChunk, int overlap, float max){
         this.cam = cam;
         this.chunkSize = chunkSize;
         this.voxelsPerChunk = voxelsPerChunk;
         this.overlap = overlap;
         this.resolution = (float)voxelsPerChunk/chunkSize;
         this.cS = (int)((float)chunkSize*resolution)+overlap;
+        this.max = max;
     }
-    public List<Vector3Int> sculpt(ref Dictionary<Vector3Int,float[]> voxels, int multi,Vector3 pos, Vector3 playerPos){
+    public List<Vector3Int> sculpt(ref Dictionary<Vector3Int,Voxel[]> voxels, int multi,Vector3 pos, Vector3 playerPos, int material){
         
         
                 Vector3Int chunk= Chunk(pos)*(chunkSize/*-overlap/*2*/);
@@ -47,7 +48,7 @@ public class sculpting{
                                 float change = Mathf.Max(0.02f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi;
                                 if( multi == -1){
                                     float distanceplayer = Vector3.Distance(new Vector3(x,y,z)/resolution+chunk,playerPos);
-                                    if(distanceplayer<2){
+                                    if(distanceplayer<2f){
                                         change = 0;
                                     }
                                     
@@ -55,10 +56,22 @@ public class sculpting{
                                 
                                 if(!(x<0 || y<0 || z<0 || x>=voxelsPerChunk || y>=voxelsPerChunk || z>=voxelsPerChunk)){
                                     int idx = x+ y*cS + z*cS*cS;
-                                    float vox = Mathf.Clamp(voxels[chunk][idx]+change,-1,1);
+                                    
+                                    Voxel original = voxels[chunk][idx];
+                                    int mat = original.material;
+                                    float newMaxL = Mathf.Min(-max,original.value);
+                                    float newMaxH = Mathf.Max(max,original.value);
+                                    //Debug.Log(newMax);
+                                    float vox = Mathf.Clamp(original.value+change,-1,1);
+
+                                    vox = Mathf.Clamp(vox,newMaxL,newMaxH);
+                                    if(original.value > 0 && multi == -1){
+                                        mat = material;
+                                    }
+                                    
                                     //clamp -1 and 1 maybe
                                     //Debug.Log(Mathf.Max(0.05f*(-0.1f*Mathf.Pow(distancevox,2)+1f)+100f,0));
-                                    voxels[chunk][idx] = vox;
+                                    voxels[chunk][idx] = new Voxel(vox,mat);
                                     bool ox = x< overlap;
                                     bool oy = y< overlap;
                                     bool oz = z< overlap;
@@ -87,7 +100,7 @@ public class sculpting{
                                         }
                                         
                                         for(int i = 0; i< thisChunks.Count;i++){
-                                            SchangeVoxels(ref voxels,change,chunk,thisChunks[i],x,y,z);
+                                            SchangeVoxels(ref voxels,change,chunk,thisChunks[i],x,y,z,material);
                                             if(!chunks.Contains(thisChunks[i])){
                                                 chunks.Add(thisChunks[i]);
                                             }
@@ -99,7 +112,7 @@ public class sculpting{
                                 else{
                                     List<Vector3Int> thisChunks = getChunksfromVoxel(x,y,z,chunk);
                                     for(int i = 0; i< thisChunks.Count;i++){
-                                        SchangeVoxels(ref voxels,change,chunk,thisChunks[i],x,y,z);
+                                        SchangeVoxels(ref voxels,change,chunk,thisChunks[i],x,y,z,material);
                                         if(!chunks.Contains(thisChunks[i])){
                                             chunks.Add(thisChunks[i]);
                                         }
@@ -168,7 +181,7 @@ public class sculpting{
 
         return chunks;
     }
-    void SchangeVoxels(ref Dictionary<Vector3Int,float[]>voxels,float change, Vector3Int chunk, Vector3Int thisChunk, int x, int y, int z){
+    void SchangeVoxels(ref Dictionary<Vector3Int,Voxel[]>voxels,float change, Vector3Int chunk, Vector3Int thisChunk, int x, int y, int z, int material){
         if(voxels.ContainsKey(thisChunk)){
             
             Vector3Int dif = chunk-thisChunk;
@@ -177,8 +190,17 @@ public class sculpting{
             //Debug.Log(x+(int)(dif.x*resolution) + " " + (z+(int)(dif.z*resolution)));
             // if(x+(int)(dif.x*resolution) == x)
             //     Debug.Log(x+(int)(dif.x*resolution) + " " +y+(int)(dif.y*resolution)+ " " + (z+(int)(dif.z*resolution)));
-            float vox=  Mathf.Clamp(voxels[thisChunk][newidx]+change,-1,1);
-            voxels[thisChunk][newidx] = vox;
+            Voxel original = voxels[thisChunk][newidx];
+            int mat = original.material;
+            float newMaxL = Mathf.Min(-max,original.value);
+            float newMaxH = Mathf.Max(max,original.value);
+            float vox=  Mathf.Clamp(original.value+change,-1,1);
+            vox = Mathf.Clamp(vox,newMaxL,newMaxH);
+            if(original.value > 0 && Mathf.Sign(change) == -1){
+                mat = material;
+            }
+            
+            voxels[thisChunk][newidx] = new Voxel(vox,mat);
             
         }  
     }

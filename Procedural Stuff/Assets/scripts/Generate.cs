@@ -32,7 +32,7 @@ using ProceduralNoiseProject;
         public int GenerateDistance=2;
         public int overlap = 1;
         public float delDistance = 60f;
-        Dictionary<Vector3Int,float[]> voxels = new Dictionary<Vector3Int, float[]>();
+        Dictionary<Vector3Int,Voxel[]> voxels = new Dictionary<Vector3Int, Voxel[]>();
 
 
         //List<GameObject> meshes = new List<GameObject>();
@@ -52,7 +52,6 @@ using ProceduralNoiseProject;
         [Space(10)]
         [Header("sculpt stuff")]
         sculpting sculp;
-        bool canGenSculp;
         
     
         void Start()
@@ -69,7 +68,7 @@ using ProceduralNoiseProject;
             //fractal = new FractalNoise(perlin, 3, 1.0f);
             fractal = new FractalNoise(perlin, fractalOctaves, fractalfrequency, fractalamplitude);
             cS = voxelsPerChunk+overlap;
-            sculp = new sculpting(cam,chunkSize,voxelsPerChunk,overlap);
+            sculp = new sculpting(cam,chunkSize,voxelsPerChunk,overlap,0.3f);
             
             
 
@@ -77,7 +76,7 @@ using ProceduralNoiseProject;
         }
         int cS; //chunkSize(in voxels) + overlap
 
-        void GenerateTerrain(Vector3Int terrainOffset, bool scu, bool end)
+        void GenerateTerrain(Vector3Int terrainOffset, bool scu)
         {
             Marching marching = null;
             if(mode == MARCHING_MODE.TETRAHEDRON)
@@ -101,7 +100,7 @@ using ProceduralNoiseProject;
             
 
             //The size of voxel array.
-            float[] chunkVoxels;
+            Voxel[] chunkVoxels;
             if(!voxels.ContainsKey(terrainOffset)){
                 
                 chunkVoxels = Voxels(/*,s*/terrainOffset);
@@ -109,6 +108,13 @@ using ProceduralNoiseProject;
             }
             else{
                 chunkVoxels = voxels[terrainOffset];
+            }
+            float[] chunkvoxs = new float[chunkVoxels.Length];
+            
+            for (int i = 0; i < chunkVoxels.Length; i++)
+            {
+                chunkvoxs[i]=chunkVoxels[i].value;
+                
             }
             
 
@@ -121,7 +127,7 @@ using ProceduralNoiseProject;
 
             //The mesh produced is not optimal. There is one vert for each index.
             //Would need to weld vertices for better quality mesh.
-            marching.Generate(chunkVoxels, cS, cS, cS, verts, indices);
+            marching.Generate(chunkvoxs, cS, cS, cS, verts, indices);
             //indices.Reverse();
             /*if(resolution != 1){
                 for(int i = 0; i< verts.Count; i++){
@@ -156,36 +162,43 @@ using ProceduralNoiseProject;
             //     verts[i] = verts[i]/resolution;
             // }
             //List<int> Indices = new List<int>();
+            List<List<int>> subIndices=new List<List<int>>(2){new List<int>(),new List<int>()};
+            for(int i = 0; i< indices.Count; i = i+3){
+                //bool normal = true;
+                Vector3 triPos = (verts[indices[i]]+verts[indices[i+1]]+verts[indices[i+2]])/3;
+                Vector3Int voxeloV = Vector3Int.FloorToInt(triPos);
+                int idx = voxeloV.x + voxeloV.y*cS + voxeloV.z*cS*cS;
+                subIndices[chunkVoxels[idx].material].Add(indices[i]);
+                subIndices[chunkVoxels[idx].material].Add(indices[i+1]);
+                subIndices[chunkVoxels[idx].material].Add(indices[i+2]);
+                // if(terrainOffset.y > -20){
+                //     if(verts[indices[i]].y + terrainOffset.y > 0){
+                //         Vector3 sideA = verts[indices[i]]-verts[indices[i+1]];
+                //         Vector3 sideB = verts[indices[i]]-verts[indices[i+2]];
+                //         Vector3 normalD =Vector3.Cross(sideA,sideB).normalized;
+                        
+                //         if(normalD.y > 0.3f){
+                //             subIndices[1].Add(indices[i]);
+                //             subIndices[1].Add(indices[i+1]);
+                //             subIndices[1].Add(indices[i+2]);
+                //             normal = false;
+                //         }
+                        
+                //     }
+                    
+                // }
+                // if(normal){
+                //     subIndices[0].Add(indices[i]);
+                //     subIndices[0].Add(indices[i+1]);
+                //     subIndices[0].Add(indices[i+2]);
+                // }
+            }
             for(int i = 0; i< verts.Count; i++){
                 verts[i]= verts[i]/resolution;
                 
                 //Indices.Add(i);
             }
-            List<List<int>> subIndices=new List<List<int>>(2){new List<int>(),new List<int>()};
-            for(int i = 0; i< indices.Count; i = i+3){
-                bool normal = true;
-                if(terrainOffset.y > -20){
-                    if(verts[indices[i]].y + terrainOffset.y > 0){
-                        Vector3 sideA = verts[indices[i]]-verts[indices[i+1]];
-                        Vector3 sideB = verts[indices[i]]-verts[indices[i+2]];
-                        Vector3 normalD =Vector3.Cross(sideA,sideB).normalized;
-                        
-                        if(normalD.y > 0.3f){
-                            subIndices[1].Add(indices[i]);
-                            subIndices[1].Add(indices[i+1]);
-                            subIndices[1].Add(indices[i+2]);
-                            normal = false;
-                        }
-                        
-                    }
-                    
-                }
-                if(normal){
-                    subIndices[0].Add(indices[i]);
-                    subIndices[0].Add(indices[i+1]);
-                    subIndices[0].Add(indices[i+2]);
-                }
-            }
+            
             
             if (verts.Count == 0) return;
             Action generateMesh = () => {
@@ -245,12 +258,6 @@ using ProceduralNoiseProject;
             };
             if(scu){
                 
-                if(end){
-                    canGenSculp = true;
-                }
-                else if(FunctionsToRunInMainThread2.Count == 0){
-                    canGenSculp = false;
-                }
                 FunctionsToRunInMainThread2.Add(generateMesh);
             }
             else{
@@ -263,11 +270,11 @@ using ProceduralNoiseProject;
         
 
         
-        float[] Voxels(/*, float _scale*/ Vector3Int _offset){
+        Voxel[] Voxels(/*, float _scale*/ Vector3Int _offset){
             //The size of voxel array.
             Vector3 v = _offset;
             Vector3 newOffset = v*resolution;
-            float[] voxels = new float[cS * cS * cS];
+            Voxel[] voxels = new Voxel[cS * cS * cS];
 
             //Fill voxels with values. Im using perlin noise but any method to create voxels will work.
             for (int x = 0; x < cS; x++)
@@ -302,7 +309,7 @@ using ProceduralNoiseProject;
             
             return voxels;
         }
-        float Voxel(int x, int y, int z, Vector3Int offset, Vector3 newOffset){
+        Voxel Voxel(int x, int y, int z, Vector3Int offset, Vector3 newOffset){
             Vector3 scaly = Vector3.one;
             //different scale
             /*if(y + Offset.y < -50){
@@ -315,6 +322,7 @@ using ProceduralNoiseProject;
             float fz = (z+newOffset.z) / (2f * scaly.z);
 
             float vox = fractal.Sample3D(fx, fy, fz);
+            int mat = 0;
             /*if(biomes.GetBiomData(new Vector3(x,y,z)/resolution+offset).biom[0] != 4){
                 vox = Mathf.Clamp(vox+0.5f,-1,1);
             }*/
@@ -324,13 +332,13 @@ using ProceduralNoiseProject;
                 // voxels[idx] = Mathf.Clamp(voxels[idx]-(y +newOffset.y -5)*0.1f,-1,1);
                 // float iks = y +newOffset.y -5;
                 // voxels[idx] = Mathf.Clamp(voxels[idx]-(0.1f*Mathf.Pow(2,iks)),-1,1);
-                
+                mat = 1;
                 float iks = y/resolution + offset.y -5;
-                vox = Mathf.Clamp(vox+(Mathf.Pow(iks,2)*0.01f),-1,1);
+                vox = Mathf.Clamp(vox+(Mathf.Pow(iks,2)*0.01f),-1f,0.2f);
                 //vox = 1;
              }
             //return Mathf.Sign(vox)/10f;//retro voxel style
-            return vox;
+            return new Voxel(vox,mat);
         }
         List<Vector3Int> currentChunks = new List<Vector3Int>();
         List<Vector3Int> oldChunks;
@@ -344,18 +352,20 @@ using ProceduralNoiseProject;
                 }
                 
             }
-            if(canGenSculp){
-                while(FunctionsToRunInMainThread2.Count > 0){
-                    Action func = FunctionsToRunInMainThread2[0];
-                    FunctionsToRunInMainThread2.RemoveAt(0);
-                    if(func != null){
-                        func();
-                    }
+            // //if(canGenSculp){
+            //     while(FunctionsToRunInMainThread2.Count > 0){
+            //         Action func = FunctionsToRunInMainThread2[0];
+            //         FunctionsToRunInMainThread2.RemoveAt(0);
+            //         if(func != null){
+            //             func();
+            //         }
                     
-                }
-            }
+            //     }
+            //     //canGenSculp = false;
+            // //}
             
             Vector3Int playerChunk = Chunk(Player.localPosition);
+            
             if(oldChunks != null){
                 for(int i = 0; i< oldChunks.Count; i++){
                     try{
@@ -386,6 +396,7 @@ using ProceduralNoiseProject;
             if(Input.GetKeyDown("g")){
                 Regenerate();
             }
+            sculpt();
             if(lastPlayerChunk != null){
                 if(lastPlayerChunk != playerChunk){
                     resetPos = true;
@@ -403,7 +414,7 @@ using ProceduralNoiseProject;
                 }
             }
             
-            sculpt();
+            
             lastPlayerChunk = playerChunk;
             
 
@@ -424,7 +435,23 @@ using ProceduralNoiseProject;
 					if(hit.transform.parent.tag == "holder"){
 						Vector3 pos = transform.InverseTransformPoint(hit.point)-hit.normal*multi;
                         Vector3 playerPos = Player.localPosition;
-                        Sthread = new Thread(() => GTL(sculp.sculpt(ref voxels,multi,pos,playerPos)));
+
+                        MeshCollider collider = hit.collider as MeshCollider;
+                        // Remember to handle case where collider is null because you hit a non-mesh primitive...
+
+                        Mesh mesh = collider.sharedMesh;
+                        int limit = hit.triangleIndex * 3;
+                        int submesh;
+                        for(submesh = 0; submesh < mesh.subMeshCount; submesh++)
+                        {
+                            int numIndices = mesh.GetTriangles(submesh).Length;
+                            if(numIndices > limit)
+                                break;
+
+                            limit -= numIndices; 
+                        }
+                        Sthread = new Thread(() => GTL(sculp.sculpt(ref voxels,multi,pos,playerPos,submesh)));
+                        
                         Sthread.Start();
                         
                         
@@ -511,8 +538,22 @@ using ProceduralNoiseProject;
 
         void GTL(List<Vector3Int> chunks){
             for(int i = 0; i< chunks.Count; i++){
-                GenerateTerrain(chunks[i],true,i==chunks.Count-1);
+                GenerateTerrain(chunks[i],true);
+
             }
+            List<Action> newActions = new List<Action>();
+            newActions = FunctionsToRunInMainThread2;
+            FunctionsToRunInMainThread2 = new List<Action>();
+            Action action = () => {
+                while(newActions.Count > 0){
+                    Action func = newActions[0];
+                    newActions.RemoveAt(0);
+                    func();
+                    
+                }
+            };
+            FunctionsToRunInMainThread.Add(action);
+            
         }
         
         bool resetPos = false;
@@ -536,7 +577,7 @@ using ProceduralNoiseProject;
                         currentChunks.Add(new Vector3Int(x,y,z));
                         if(!generatedChunks.Contains(new Vector3Int(x,y,z))){
                             generatedChunks.Add(new Vector3Int(x,y,z));
-                            GenerateTerrain(new Vector3Int(x*(chunkSize/*-overlap/*2*/),y*(chunkSize/*-overlap/*2*/),z*(chunkSize/*-overlap/*2*/)),false,false);
+                            GenerateTerrain(new Vector3Int(x*(chunkSize/*-overlap/*2*/),y*(chunkSize/*-overlap/*2*/),z*(chunkSize/*-overlap/*2*/)),false);
                             
                             //Thread t = new Thread(() => GenerateTerrain(new Vector3(x*(chunkSize-overlap*2),y*(chunkSize-overlap*2),z*(chunkSize-overlap*2))));
                             //t.Start();
@@ -561,7 +602,7 @@ using ProceduralNoiseProject;
                     Destroy(child.gameObject);
             }
             meshes= new Dictionary<Vector3Int, GameObject>();
-            voxels = new Dictionary<Vector3Int, float[]>();
+            voxels = new Dictionary<Vector3Int, Voxel[]>();
             if(random){
                 seed = UnityEngine.Random.Range(-1000000,1000000);
                 INoise perlin = new PerlinNoise(seed, 2/scale/resolution);
@@ -599,7 +640,7 @@ using ProceduralNoiseProject;
             voxelsPerChunk= (int)newResolution;
             resolution = (float)voxelsPerChunk/chunkSize;
             cS = voxelsPerChunk+overlap;
-            sculp = new sculpting(cam,chunkSize,voxelsPerChunk,overlap);
+            sculp = new sculpting(cam,chunkSize,voxelsPerChunk,overlap,0.4f);
         }
         #endregion
         [Space(10)]
@@ -618,6 +659,14 @@ using ProceduralNoiseProject;
         
 
 
+    }
+    public class Voxel{
+        public float value;
+        public int material;
+        public Voxel(float value, int material){
+            this.value = value;
+            this.material = material;
+        }
     }
     
 
