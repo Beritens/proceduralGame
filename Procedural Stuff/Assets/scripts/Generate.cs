@@ -17,7 +17,7 @@ using ProceduralNoiseProject;
         public Transform Container;
         public Transform Player;
         public bool random;
-        public Material[] m_materials;
+        public List<Material> m_materials;
         
 
         public MARCHING_MODE mode = MARCHING_MODE.CUBES;
@@ -162,11 +162,14 @@ using ProceduralNoiseProject;
             //     verts[i] = verts[i]/resolution;
             // }
             //List<int> Indices = new List<int>();
-            List<List<int>> subIndices=new List<List<int>>(2){new List<int>(),new List<int>()};
+            List<List<int>> subIndices=new List<List<int>>();
+            for(int i = 0; i< m_materials.Count; i++){
+                subIndices.Add(new List<int>());
+            }
             for(int i = 0; i< indices.Count; i = i+3){
                 //bool normal = true;
                 Vector3 triPos = (verts[indices[i]]+verts[indices[i+1]]+verts[indices[i+2]])/3;
-                Vector3Int voxeloV = Vector3Int.FloorToInt(triPos);
+                Vector3Int voxeloV = Vector3Int.RoundToInt(triPos);
                 int idx = voxeloV.x + voxeloV.y*cS + voxeloV.z*cS*cS;
                 subIndices[chunkVoxels[idx].material].Add(indices[i]);
                 subIndices[chunkVoxels[idx].material].Add(indices[i+1]);
@@ -287,20 +290,6 @@ using ProceduralNoiseProject;
                         int idx = x + y * cS + z * cS * cS;
 
                         voxels[idx] = Voxel(x,y,z,_offset,newOffset);
-
-                        
-                        //bedrock
-                       /* else if(y + newOffset.y < -15){
-                            
-                            //Debug.Log("hi");
-                            voxels[idx] = Mathf.Clamp(voxels[idx]-(y + newOffset.y +15)*0.05f,-1,1);
-                            //voxels[idx] = 1;
-                        }*/
-                        /*if(x== 0 || y == 0 || z== 0 || x == cS-1 || y== cS-1 || z == cS -1){
-                            
-                            voxels[idx] = surface;
-                        }*/
-                        //voxels[idx]= Mathf.Clamp(voxels[idx]-(0.5f*(float)y/cS),-1,1);
                         
                         
                     }
@@ -328,13 +317,18 @@ using ProceduralNoiseProject;
             }*/
 
             //vox= Mathf.Clamp(vox+0.5f,-1,1); //less caves
-            if(y/resolution + offset.y > 5){
+            float posy = y/resolution + offset.y;
+            if(posy > 5){
                 // voxels[idx] = Mathf.Clamp(voxels[idx]-(y +newOffset.y -5)*0.1f,-1,1);
                 // float iks = y +newOffset.y -5;
                 // voxels[idx] = Mathf.Clamp(voxels[idx]-(0.1f*Mathf.Pow(2,iks)),-1,1);
+                //bool b = fractal.Sample2D(x/1f,z/1f)>0;
                 mat = 1;
-                float iks = y/resolution + offset.y -5;
+                float iks = posy -5;
                 vox = Mathf.Clamp(vox+(Mathf.Pow(iks,2)*0.01f),-1f,0.2f);
+                /*if(posy > 7){
+                    mat = 2;
+                }*/
                 //vox = 1;
              }
             //return Mathf.Sign(vox)/10f;//retro voxel style
@@ -393,9 +387,9 @@ using ProceduralNoiseProject;
             }
             
             //offset = offset+Vector3.right;
-            if(Input.GetKeyDown("g")){
-                Regenerate();
-            }
+            // if(Input.GetKeyDown("g")){
+            //     //Regenerate();
+            // }
             sculpt();
             if(lastPlayerChunk != null){
                 if(lastPlayerChunk != playerChunk){
@@ -441,15 +435,20 @@ using ProceduralNoiseProject;
 
                         Mesh mesh = collider.sharedMesh;
                         int limit = hit.triangleIndex * 3;
-                        int submesh;
-                        for(submesh = 0; submesh < mesh.subMeshCount; submesh++)
-                        {
-                            int numIndices = mesh.GetTriangles(submesh).Length;
-                            if(numIndices > limit)
-                                break;
+                        int submesh = 0;
+                        if(multi == -1){
+                            for(submesh = 0; submesh < mesh.subMeshCount; submesh++)
+                            {
+                                int numIndices = mesh.GetTriangles(submesh).Length;
+                                if(numIndices > limit)
+                                    break;
 
-                            limit -= numIndices; 
+                                limit -= numIndices; 
+                            }
+                            Material material = collider.GetComponent<MeshRenderer>().sharedMaterials[submesh];
+                            submesh = m_materials.IndexOf(material);
                         }
+                        
                         Sthread = new Thread(() => GTL(sculp.sculpt(ref voxels,multi,pos,playerPos,submesh)));
                         
                         Sthread.Start();

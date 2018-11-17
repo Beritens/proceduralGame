@@ -6275,7 +6275,7 @@ Prefab:
       objectReference: {fileID: 2100000, guid: cd403d1c83d195c49a51de239c259763, type: 2}
     - target: {fileID: 11400000, guid: 753ea9ccf9eee6c42a0954ec8663b992, type: 2}
       propertyPath: m_MovePower
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 753ea9ccf9eee6c42a0954ec8663b992, type: 2}
       propertyPath: m_MaxAngularVelocity
@@ -6318,6 +6318,22 @@ Prefab:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 4300052, guid: d05d496cb4f43c14e80630addd23652e, type: 3}
+    - target: {fileID: 5400000, guid: 753ea9ccf9eee6c42a0954ec8663b992, type: 2}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 753ea9ccf9eee6c42a0954ec8663b992, type: 2}
+      propertyPath: m_UseTorque
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5400000, guid: 753ea9ccf9eee6c42a0954ec8663b992, type: 2}
+      propertyPath: m_Constraints
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5400000, guid: 753ea9ccf9eee6c42a0954ec8663b992, type: 2}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 753ea9ccf9eee6c42a0954ec8663b992, type: 2}
   m_IsPrefabParent: 0
@@ -7449,6 +7465,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1684444670}
   - component: {fileID: 1684444671}
+  - component: {fileID: 1684444672}
   m_Layer: 9
   m_Name: WholeLevel
   m_TagString: Untagged
@@ -7499,6 +7516,17 @@ MonoBehaviour:
   fractalamplitudeH: 1
   test: {x: 1, y: 0, z: 0}
   HseedOffset: 7456
+--- !u!114 &1684444672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1684444669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe830712142739143a4433b50fda7d8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1686316377
 GameObject:
   m_ObjectHideFlags: 0
@@ -7905,7 +7933,7 @@ Light:
     m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 0.814
+    m_Strength: 0.644
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
