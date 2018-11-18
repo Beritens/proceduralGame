@@ -1,0 +1,154 @@
+ (0,0): [11.17.2018 09:10:36.537 ] Unity incremental compiler server
+ (0,0): [11.17.2018 09:10:36.616 ] watchdog active on pid: 11832
+ (0,0): [11.17.2018 09:10:40.573 ] Unity.Properties.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:40.586 ] Unity.Properties.dll compiling...
+ (0,0): [11.17.2018 09:10:40.612 ] Unity.Mathematics.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:40.624 ] Unity.Mathematics.dll compiling...
+ (0,0): [11.17.2018 09:10:40.839 ] UnityEditor.StandardEvents.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:40.840 ] Unity.PackageManagerUI.Editor.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:40.841 ] Unity.Burst.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:40.855 ] Unity.Burst.dll compiling...
+ (0,0): [11.17.2018 09:10:40.855 ] Unity.PackageManagerUI.Editor.dll compiling...
+ (0,0): [11.17.2018 09:10:40.855 ] UnityEditor.StandardEvents.dll compiling...
+ (0,0): [11.17.2018 09:10:42.753 ] Unity.Properties.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Properties.dll
+ (0,0): [11.17.2018 09:10:42.754 ] Unity.Burst.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Burst.dll
+ (0,0): [11.17.2018 09:10:42.754 ] Unity.PackageManagerUI.Editor.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.PackageManagerUI.Editor.dll
+ (0,0): [11.17.2018 09:10:42.754 ] UnityEditor.StandardEvents.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\UnityEditor.StandardEvents.dll
+ (0,0): [11.17.2018 09:10:42.754 ] Unity.Mathematics.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Mathematics.dll
+ (0,0): [11.17.2018 09:10:42.790 ] Unity.Burst.dll compilation finished in 1935ms  source files re-parsed: 2 metadata reloaded: 0
+ (0,0): [11.17.2018 09:10:42.800 ] Unity.Mathematics.dll compilation finished in 2176ms  source files re-parsed: 44 metadata reloaded: 149
+ (0,0): [11.17.2018 09:10:42.802 ] Unity.Burst.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:42.803 ] Unity.Properties.dll compilation finished in 2217ms  source files re-parsed: 20 metadata reloaded: 197
+ (0,0): [11.17.2018 09:10:42.811 ] Unity.Mathematics.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:42.800 ] UnityEditor.StandardEvents.dll compilation finished in 1945ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 09:10:42.815 ] Unity.Properties.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:42.800 ] Unity.PackageManagerUI.Editor.dll compilation finished in 1945ms  source files re-parsed: 37 metadata reloaded: 0
+ (0,0): [11.17.2018 09:10:42.825 ] UnityEditor.StandardEvents.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:42.836 ] Unity.PackageManagerUI.Editor.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.167 ] Unity.Collections.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.178 ] Unity.Collections.dll compiling...
+ (0,0): [11.17.2018 09:10:43.281 ] Unity.Collections.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Collections.dll
+ (0,0): [11.17.2018 09:10:43.291 ] Unity.Burst.Editor.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.303 ] Unity.Burst.Editor.dll compiling...
+ (0,0): [11.17.2018 09:10:43.304 ] Unity.Collections.dll compilation finished in 126ms  source files re-parsed: 10 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:43.315 ] Unity.Collections.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.389 ] Unity.Properties.Editor.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.392 ] Unity.Burst.Editor.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Burst.Editor.dll
+ (0,0): [11.17.2018 09:10:43.400 ] Unity.Properties.Editor.dll compiling...
+ (0,0): [11.17.2018 09:10:43.417 ] Unity.Burst.Editor.dll compilation finished in 114ms  source files re-parsed: 9 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:43.436 ] Unity.Burst.Editor.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.516 ] Unity.Properties.Editor.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Properties.Editor.dll
+ (0,0): [11.17.2018 09:10:43.517 ] Unity.Entities.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.528 ] Unity.Entities.dll compiling...
+ (0,0): [11.17.2018 09:10:43.537 ] Unity.Properties.Editor.dll compilation finished in 137ms  source files re-parsed: 7 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:43.556 ] Unity.Properties.Editor.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.608 ] Unity.Jobs.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.624 ] Unity.Jobs.dll compiling...
+ (0,0): [11.17.2018 09:10:43.703 ] Unity.Jobs.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Jobs.dll
+ (0,0): [11.17.2018 09:10:43.742 ] Unity.Jobs.dll compilation finished in 118ms  source files re-parsed: 3 metadata reloaded: 0
+ (0,0): [11.17.2018 09:10:43.754 ] Unity.Jobs.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.853 ] Unity.Entities.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Entities.dll
+ (0,0): [11.17.2018 09:10:43.878 ] Unity.Entities.dll compilation finished in 350ms  source files re-parsed: 54 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:43.889 ] Unity.Entities.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.945 ] Unity.Jobs.Editor.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:43.956 ] Unity.Jobs.Editor.dll compiling...
+ (0,0): [11.17.2018 09:10:43.984 ] Unity.Jobs.Editor.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Jobs.Editor.dll
+ (0,0): [11.17.2018 09:10:44.004 ] Unity.Jobs.Editor.dll compilation finished in 49ms  source files re-parsed: 1 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:44.015 ] Unity.Jobs.Editor.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.073 ] Unity.Entities.Hybrid.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.084 ] Unity.Entities.Hybrid.dll compiling...
+ (0,0): [11.17.2018 09:10:44.152 ] Unity.Entities.Hybrid.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Entities.Hybrid.dll
+ (0,0): [11.17.2018 09:10:44.173 ] Unity.Entities.Hybrid.dll compilation finished in 89ms  source files re-parsed: 11 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:44.184 ] Unity.Entities.Hybrid.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.394 ] Unity.Transforms.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.405 ] Unity.Transforms.dll compiling...
+ (0,0): [11.17.2018 09:10:44.467 ] Unity.Transforms.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Transforms.dll
+ (0,0): [11.17.2018 09:10:44.489 ] Unity.Transforms.dll compilation finished in 84ms  source files re-parsed: 14 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:44.501 ] Unity.Transforms.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.717 ] Unity.Entities.Properties.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.729 ] Unity.Entities.Properties.dll compiling...
+ (0,0): [11.17.2018 09:10:44.778 ] Unity.Entities.Properties.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Entities.Properties.dll
+ (0,0): [11.17.2018 09:10:44.817 ] Unity.Entities.Properties.dll compilation finished in 88ms  source files re-parsed: 4 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:44.822 ] Unity.Rendering.Hybrid.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.828 ] Unity.Entities.Properties.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.834 ] Unity.Rendering.Hybrid.dll compiling...
+ (0,0): [11.17.2018 09:10:44.876 ] Unity.Rendering.Hybrid.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Rendering.Hybrid.dll
+ (0,0): [11.17.2018 09:10:44.898 ] Unity.Rendering.Hybrid.dll compilation finished in 64ms  source files re-parsed: 6 metadata reloaded: 0
+ (0,0): [11.17.2018 09:10:44.909 ] Unity.Rendering.Hybrid.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.916 ] Unity.Transforms.Hybrid.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:44.927 ] Unity.Transforms.Hybrid.dll compiling...
+ (0,0): [11.17.2018 09:10:44.964 ] Unity.Transforms.Hybrid.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Transforms.Hybrid.dll
+ (0,0): [11.17.2018 09:10:44.986 ] Unity.Transforms.Hybrid.dll compilation finished in 59ms  source files re-parsed: 6 metadata reloaded: 0
+ (0,0): [11.17.2018 09:10:44.998 ] Unity.Transforms.Hybrid.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:45.013 ] Unity.Transforms2D.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:45.024 ] Unity.Transforms2D.dll compiling...
+ (0,0): [11.17.2018 09:10:45.052 ] Unity.Transforms2D.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Transforms2D.dll
+ (0,0): [11.17.2018 09:10:45.072 ] Unity.Transforms2D.dll compilation finished in 48ms  source files re-parsed: 4 metadata reloaded: 0
+ (0,0): [11.17.2018 09:10:45.083 ] Unity.Transforms2D.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:45.107 ] Unity.Entities.Editor.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:45.118 ] Unity.Entities.Editor.dll compiling...
+ (0,0): [11.17.2018 09:10:45.203 ] Unity.Entities.Editor.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Unity.Entities.Editor.dll
+ (0,0): [11.17.2018 09:10:45.225 ] Unity.Entities.Editor.dll compilation finished in 107ms  source files re-parsed: 19 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:45.236 ] Unity.Entities.Editor.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:48.018 ] Assembly-CSharp-firstpass.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:48.029 ] Assembly-CSharp-firstpass.dll compiling...
+ (0,0): [11.17.2018 09:10:48.147 ] Assembly-CSharp-firstpass.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp-firstpass.dll
+ (0,0): [11.17.2018 09:10:48.182 ] Assembly-CSharp-firstpass.dll compilation finished in 152ms  source files re-parsed: 52 metadata reloaded: 9
+ (0,0): [11.17.2018 09:10:48.193 ] Assembly-CSharp-firstpass.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:48.507 ] Assembly-CSharp.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:48.518 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 09:10:48.587 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 09:10:48.599 ] Assembly-CSharp.dll compilation finished in 80ms  source files re-parsed: 25 metadata reloaded: 1
+ (0,0): [11.17.2018 09:10:48.623 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:10:48.626 ] Assembly-CSharp-Editor-firstpass.dll: no prior compilation found in cache. Caller PID: 11832
+ (0,0): [11.17.2018 09:10:48.637 ] Assembly-CSharp-Editor-firstpass.dll compiling...
+ (0,0): [11.17.2018 09:10:48.664 ] Assembly-CSharp-Editor-firstpass.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp-Editor-firstpass.dll
+ (0,0): [11.17.2018 09:10:48.686 ] Assembly-CSharp-Editor-firstpass.dll compilation finished in 49ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 09:10:48.698 ] Assembly-CSharp-Editor-firstpass.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:11:31.376 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 09:11:31.433 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 09:11:31.444 ] Assembly-CSharp.dll compilation finished in 68ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 09:11:31.456 ] Assembly-CSharp.dll: compilation was cached, 1 file(s) were found to have changed. Caller PID: 11832
+ (0,0): [11.17.2018 09:11:31.467 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 09:15:39.204 ] Compiler cache size is now 13,91 MB
+ (0,0): [11.17.2018 09:47:17.087 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 09:47:17.146 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 09:47:17.169 ] Assembly-CSharp.dll compilation finished in 82ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 09:47:17.180 ] Assembly-CSharp.dll: compilation was cached, 1 file(s) were found to have changed. Caller PID: 11832
+ (0,0): [11.17.2018 09:47:17.191 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 10:00:25.373 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 10:00:25.419 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 10:00:25.430 ] Assembly-CSharp.dll compilation finished in 57ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 10:00:25.442 ] Assembly-CSharp.dll: compilation was cached, 1 file(s) were found to have changed. Caller PID: 11832
+ (0,0): [11.17.2018 10:00:25.453 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 10:24:54.081 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 10:24:54.141 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 10:24:54.164 ] Assembly-CSharp.dll compilation finished in 83ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 10:24:54.175 ] Assembly-CSharp.dll: compilation was cached, 1 file(s) were found to have changed. Caller PID: 11832
+ (0,0): [11.17.2018 10:24:54.186 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 10:26:23.727 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 10:26:23.784 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 10:26:23.808 ] Assembly-CSharp.dll compilation finished in 81ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 10:26:23.819 ] Assembly-CSharp.dll: compilation was cached, 1 file(s) were found to have changed. Caller PID: 11832
+ (0,0): [11.17.2018 10:26:23.830 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 10:27:01.211 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 10:27:01.265 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 10:27:01.288 ] Assembly-CSharp.dll compilation finished in 76ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 10:27:01.299 ] Assembly-CSharp.dll: compilation was cached, 1 file(s) were found to have changed. Caller PID: 11832
+ (0,0): [11.17.2018 10:27:01.310 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 10:30:22.337 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 10:30:22.397 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 10:30:22.420 ] Assembly-CSharp.dll compilation finished in 82ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 10:30:22.431 ] Assembly-CSharp.dll: compilation was cached, 1 file(s) were found to have changed. Caller PID: 11832
+ (0,0): [11.17.2018 10:30:22.442 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 10:38:30.160 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 10:38:30.214 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 10:38:30.237 ] Assembly-CSharp.dll compilation finished in 76ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 10:38:30.248 ] Assembly-CSharp.dll: compilation was cached, 1 file(s) were found to have changed. Caller PID: 11832
+ (0,0): [11.17.2018 10:38:30.259 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 10:38:45.433 ] Assembly-CSharp.dll compiling...
+ (0,0): [11.17.2018 10:38:45.488 ] Assembly-CSharp.dll: emitting IL to : C:\Users\Ben\Documents\GitHub\proceduralGame\Procedural Stuff\Temp\Assembly-CSharp.dll
+ (0,0): [11.17.2018 10:38:45.511 ] Assembly-CSharp.dll compilation finished in 78ms  source files re-parsed: 1 metadata reloaded: 0
+ (0,0): [11.17.2018 10:38:45.522 ] Assembly-CSharp.dll: compilation was cached, 1 file(s) were found to have changed. Caller PID: 11832
+ (0,0): [11.17.2018 10:38:45.533 ] Assembly-CSharp.dll: session status updated to IncrementalCompilationStatus.Finished for Caller PID: 11832
+ (0,0): [11.17.2018 10:39:03.746 ] watchdog triggered an exit

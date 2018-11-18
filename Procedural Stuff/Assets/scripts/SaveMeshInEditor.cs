@@ -6,7 +6,7 @@ using UnityEditor;
 
 public class SaveMeshInEditor : MonoBehaviour
 {
-
+    
     public KeyCode saveKey = KeyCode.F12;
     public string saveName = "SavedMesh";
     public Transform selectedGameObject;

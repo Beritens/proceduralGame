@@ -374,12 +374,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_material: {fileID: 2100000, guid: 7dede29f0eaad3f498de7761ce54963e, type: 2}
+  voxelObject: {fileID: 11400000, guid: ff58e18ad6aa0a24d84b7af164fd89ce, type: 2}
   mode: 0
   seed: 447
   cam: {fileID: 413436880}
-  width: 32
-  height: 32
-  length: 32
+  voxels: []
+  width: 10
+  height: 10
+  length: 10
   scale: 1
 --- !u!4 &842983422
 Transform:

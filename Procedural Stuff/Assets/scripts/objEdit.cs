@@ -9,11 +9,11 @@ namespace MarchingCubesProject
 
     //public enum MARCHING_MODE {  CUBES, TETRAHEDRON };
 
-    public class sculpt : MonoBehaviour
+    public class objEdit : MonoBehaviour
     {
 
         public Material m_material;
-
+		public VoxelObject voxelObject;
         public MARCHING_MODE mode = MARCHING_MODE.CUBES;
 
         public int seed = 0;
@@ -33,7 +33,7 @@ namespace MarchingCubesProject
 		/// </summary>
 		void Start()
 		{
-			
+			voxels = null;
 			Generate();
 		}
 
@@ -70,8 +70,8 @@ namespace MarchingCubesProject
 						for (int z = 0; z < length; z++)
 						{
 							float voxel = 0;
-							float distance = Vector3.Distance(new Vector3(x,y,z),new Vector3((float)width/2,(float)height/2,(float)length/2));
-							voxel = -((5/distance)*2-1);
+							float distance = Vector3.Distance(new Vector3(x+0.5f,y+0.5f,z+0.5f),new Vector3((float)width/2,(float)height/2,(float)length/2));
+							voxel = -((0.7f/distance)*2-1);
 							float fx = x;
 							float fy = y;
 							float fz = z;
@@ -179,7 +179,7 @@ namespace MarchingCubesProject
 									int idx = x+ y*width + z*width*height;
 									if(x>0 && y> 0 && z > 0 && x<width-1 && y < height-1 && z < length-1){
 										float distancevox = Vector3.Distance(pos,new Vector3(x,y,z));
-										voxels[idx] = Mathf.Clamp(voxels[idx]-Mathf.Max(0.02f*(0.5f*(-0.05f*Mathf.Pow(distancevox,2)+1f)),0)*multi,-1,1);
+										voxels[idx] = Mathf.Clamp(voxels[idx]-Mathf.Max(0.02f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi,-1,1);
 									}
 								}
 							}	
@@ -193,6 +193,19 @@ namespace MarchingCubesProject
 						t.Start();
 					}
 				}
+			}
+			if(Input.GetKeyDown("g")){
+				//ScriptableObject.CreateInstance("VoxelObject");
+				//t = new Thread(Generate);
+				//t.Start();
+				voxelObject.voxels = voxels;
+			}
+			if(Input.GetKeyDown("h")){
+				//ScriptableObject.CreateInstance("VoxelObject");
+				voxels = voxelObject.voxels;
+				t = new Thread(Generate);
+				t.Start();
+				
 			}
         }
 

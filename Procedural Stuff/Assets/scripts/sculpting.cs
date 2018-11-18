@@ -35,21 +35,24 @@ public class sculpting{
                     
                     int _y = Mathf.FloorToInt((pos.y-chunk.y)*resolution);
                     int _z = Mathf.FloorToInt((pos.z-chunk.z)*resolution);
+                    int changeDis = 3-multi;
                     //int idx = x+ y*chunkSize + z*chunkSize*chunkSize;
-                    for(int x = _x-2; x<= _x+2; x++){
-                        for(int y = _y-2; y<= _y+2; y++){
-                            for(int z = _z-2; z<= _z+2; z++){
+                    for(int x = _x-changeDis; x<= _x+changeDis; x++){
+                        for(int y = _y-changeDis; y<= _y+changeDis; y++){
+                            for(int z = _z-changeDis; z<= _z+changeDis; z++){
                                 
                                 float distancevox = Vector3.Distance(pos-chunk,new Vector3(x,y,z)/resolution);
                                 
                                 
                                 //float factor = Mathf.Clamp((distanceplayer-0.5f)/3f,0,1);
+                                bool nearPlayer = false;
                                 
                                 float change = Mathf.Max(0.02f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi;
                                 if( multi == -1){
                                     float distanceplayer = Vector3.Distance(new Vector3(x,y,z)/resolution+chunk,playerPos);
                                     if(distanceplayer<2f){
                                         change = 0;
+                                        nearPlayer = true;
                                     }
                                     
                                 }
@@ -65,7 +68,7 @@ public class sculpting{
                                     float vox = Mathf.Clamp(original.value+change,-1,1);
 
                                     vox = Mathf.Clamp(vox,newMaxL,newMaxH);
-                                    if(original.value > 0 && multi == -1){
+                                    if( (change < 0 || nearPlayer)  && (original.value > 0.05f)){
                                         mat = material;
                                     }
                                     
@@ -100,7 +103,7 @@ public class sculpting{
                                         }
                                         
                                         for(int i = 0; i< thisChunks.Count;i++){
-                                            SchangeVoxels(ref voxels,change,chunk,thisChunks[i],x,y,z,material);
+                                            SchangeVoxels(ref voxels,change,chunk,thisChunks[i],x,y,z,material,nearPlayer);
                                             if(!chunks.Contains(thisChunks[i])){
                                                 chunks.Add(thisChunks[i]);
                                             }
@@ -112,7 +115,7 @@ public class sculpting{
                                 else{
                                     List<Vector3Int> thisChunks = getChunksfromVoxel(x,y,z,chunk);
                                     for(int i = 0; i< thisChunks.Count;i++){
-                                        SchangeVoxels(ref voxels,change,chunk,thisChunks[i],x,y,z,material);
+                                        SchangeVoxels(ref voxels,change,chunk,thisChunks[i],x,y,z,material,nearPlayer);
                                         if(!chunks.Contains(thisChunks[i])){
                                             chunks.Add(thisChunks[i]);
                                         }
@@ -181,7 +184,7 @@ public class sculpting{
 
         return chunks;
     }
-    void SchangeVoxels(ref Dictionary<Vector3Int,Voxel[]>voxels,float change, Vector3Int chunk, Vector3Int thisChunk, int x, int y, int z, int material){
+    void SchangeVoxels(ref Dictionary<Vector3Int,Voxel[]>voxels,float change, Vector3Int chunk, Vector3Int thisChunk, int x, int y, int z, int material, bool nearPlayer){
         if(voxels.ContainsKey(thisChunk)){
             
             Vector3Int dif = chunk-thisChunk;
@@ -196,7 +199,7 @@ public class sculpting{
             float newMaxH = Mathf.Max(max,original.value);
             float vox=  Mathf.Clamp(original.value+change,-1,1);
             vox = Mathf.Clamp(vox,newMaxL,newMaxH);
-            if(original.value > 0 && Mathf.Sign(change) == -1){
+            if( (change < 0 || nearPlayer)  && (original.value > 0.05f)){
                 mat = material;
             }
             

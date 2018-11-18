@@ -1244,6 +1244,8 @@ MonoBehaviour:
   materials:
   - {fileID: 2100000, guid: fb8a03accb87f7a4abc7af51618a72be, type: 2}
   - {fileID: 2100000, guid: 7dede29f0eaad3f498de7761ce54963e, type: 2}
+  - {fileID: 2100000, guid: 566d10500688ee64a8d99fda4d8e4336, type: 2}
+  - {fileID: 2100000, guid: e37071d189971c94190abd8c484f9901, type: 2}
   random: 1
 --- !u!4 &579146093 stripped
 Transform:
@@ -7107,6 +7109,8 @@ MonoBehaviour:
   m_materials:
   - {fileID: 2100000, guid: fb8a03accb87f7a4abc7af51618a72be, type: 2}
   - {fileID: 2100000, guid: 7dede29f0eaad3f498de7761ce54963e, type: 2}
+  - {fileID: 2100000, guid: 566d10500688ee64a8d99fda4d8e4336, type: 2}
+  - {fileID: 2100000, guid: e37071d189971c94190abd8c484f9901, type: 2}
   mode: 0
   seed: 180
   chunkSize: 20
@@ -7153,6 +7157,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1505483711 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 100000, guid: 753ea9ccf9eee6c42a0954ec8663b992, type: 2}
+  m_PrefabInternal: {fileID: 971775134}
+--- !u!114 &1505483717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1505483711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fff00f8ee03e9b74fbb1e7c57b80a336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1509737165
 GameObject:
   m_ObjectHideFlags: 0
