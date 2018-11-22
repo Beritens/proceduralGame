@@ -51,7 +51,7 @@ using ProceduralNoiseProject;
         [Space(10)]
         [Header("sculpt stuff")]
         public sculpting sculp;
-        public Generation generation;
+        voxGeneration generation;
         
     
         void Start()
@@ -64,12 +64,13 @@ using ProceduralNoiseProject;
             //biomes.changeSeed(seed);
             //UnityEngine.Random.InitState(seed+1);
             //print(UnityEngine.Random.value > 0.5f);
-            INoise perlin = new PerlinNoise(seed, 2/scale/resolution);
+            //INoise perlin = new PerlinNoise(seed, 2/scale/resolution);
+            float freq =  2/scale/resolution;
             //fractal = new FractalNoise(perlin, 3, 1.0f);
-            fractal = new FractalNoise(perlin, fractalOctaves, fractalfrequency, fractalamplitude);
+            //fractal = new FractalNoise(perlin, fractalOctaves, fractalfrequency, fractalamplitude);
             cS = voxelsPerChunk+overlap;
-            sculp = new sculpting(cam,chunkSize,voxelsPerChunk,overlap,0.3f);
-            generation = new Generation(m_materials,transform, fractal, cS, resolution);
+            sculp = new sculpting(chunkSize,voxelsPerChunk,overlap,0.3f);
+            generation = new voxGeneration(cS, resolution,seed, freq);
 
                 
         }
@@ -145,23 +146,33 @@ using ProceduralNoiseProject;
                 //Indices.Add(i);
             }
             
-            
-            if (verts.Count == 0) return;
-            Action generateMesh = () => {
-
-                GameObject go = generation.genMesh(verts,subIndices);
-                go.transform.localPosition = terrainOffset;
-                
-                if(meshes.ContainsKey(terrainOffset)){
-                    Destroy(meshes[terrainOffset]);
-                    meshes[terrainOffset]=go;
+            Action generateMesh;
+            if (verts.Count == 0){
+                generateMesh = () => {
+                    if(meshes.ContainsKey(terrainOffset)){
+                        Destroy(meshes[terrainOffset]);
+                    }
                     
-                }
-                else{
-                    meshes.Add(terrainOffset,go);
-                }
-                
-            };
+                };
+            }
+            else{
+                generateMesh = () => {
+
+                    GameObject go = meshGeneration.genMesh(verts,subIndices,m_materials,transform);
+                    go.transform.localPosition = terrainOffset;
+                    
+                    if(meshes.ContainsKey(terrainOffset)){
+                        Destroy(meshes[terrainOffset]);
+                        meshes[terrainOffset]=go;
+                        
+                    }
+                    else{
+                        meshes.Add(terrainOffset,go);
+                    }
+                    
+                };
+            }
+            
             if(scu){
                 
                 FunctionsToRunInMainThread2.Add(generateMesh);
@@ -252,10 +263,10 @@ using ProceduralNoiseProject;
 				if(Input.GetButton("Fire2"))
 					multi = -1;
 				RaycastHit hit;
-        		Ray ray = cam.ScreenPointToRay(new Vector2(Screen.width/2,Screen.height/2));
+        		Ray ray = new Ray(cam.transform.position, cam.transform.forward);
 				
 				if(Physics.Raycast(ray, out hit,30f)){
-					if(hit.transform.parent.tag == "holder"){
+					if(hit.transform.parent == transform){
 						Vector3 pos = transform.InverseTransformPoint(hit.point)-hit.normal*multi;
                         Vector3 playerPos = Player.localPosition;
 
@@ -388,7 +399,7 @@ using ProceduralNoiseProject;
             voxelsPerChunk= (int)newResolution;
             resolution = (float)voxelsPerChunk/chunkSize;
             cS = voxelsPerChunk+overlap;
-            sculp = new sculpting(cam,chunkSize,voxelsPerChunk,overlap,0.4f);
+            sculp = new sculpting(chunkSize,voxelsPerChunk,overlap,0.4f);
         }
         #endregion
         [Space(10)]

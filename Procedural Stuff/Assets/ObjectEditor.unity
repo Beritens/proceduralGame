@@ -373,8 +373,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b832b0da972cc6a499b600d7eff9078d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_material: {fileID: 2100000, guid: 7dede29f0eaad3f498de7761ce54963e, type: 2}
-  voxelObject: {fileID: 11400000, guid: ff58e18ad6aa0a24d84b7af164fd89ce, type: 2}
+  m_materials:
+  - {fileID: 2100000, guid: 7dede29f0eaad3f498de7761ce54963e, type: 2}
   mode: 0
   seed: 447
   cam: {fileID: 413436880}
@@ -383,6 +383,7 @@ MonoBehaviour:
   height: 10
   length: 10
   scale: 1
+  textAsset: {fileID: 4900000, guid: 269bee85e664f5c46862710c2e48fb08, type: 3}
 --- !u!4 &842983422
 Transform:
   m_ObjectHideFlags: 0

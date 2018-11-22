@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System;
 using System.Threading;
 using ProceduralNoiseProject;
+using UnityEditor;
+using System.IO;
 
 namespace MarchingCubesProject
 {
@@ -11,22 +13,24 @@ namespace MarchingCubesProject
 
     public class objEdit : MonoBehaviour
     {
+		
 
-        public Material m_material;
-		public VoxelObject voxelObject;
+        public List<Material> m_materials;
+		//public VoxelObject voxelObject;
         public MARCHING_MODE mode = MARCHING_MODE.CUBES;
 
         public int seed = 0;
 		public Camera cam;
 
         List<GameObject> meshes = new List<GameObject>();
-		public float[] voxels = null;
+		public Voxel[] voxels = null;
 		public int width = 32;
 		public int height = 32;
 		public int length = 32;
 		public int scale = 1;
 		Marching marching = null;
 		List<Action> actions = new List<Action>();
+		public TextAsset textAsset;
 		/// <summary>
 		/// Start is called on the frame when a script is enabled just before
 		/// any of the Update methods is called the first time.
@@ -36,7 +40,7 @@ namespace MarchingCubesProject
 			voxels = null;
 			Generate();
 		}
-
+		
         void Generate()
         {
 
@@ -60,7 +64,7 @@ namespace MarchingCubesProject
             marching.Surface = 0.0f;
 
 			if(voxels == null){
-				voxels = new float[width * height * length];
+				voxels = new Voxel[width * height * length];
 
 				//Fill voxels with values. Im using perlin noise but any method to create voxels will work.
 				for (int x = 0; x < width; x++)
@@ -77,7 +81,7 @@ namespace MarchingCubesProject
 							float fz = z;
 
 							int idx = x + y * width + z * width * height;
-							voxels[idx] = voxel;
+							voxels[idx] = new Voxel(voxel, 0);
 						}
 					}
 				}
@@ -87,10 +91,14 @@ namespace MarchingCubesProject
 
             List<Vector3> verts = new List<Vector3>();
             List<int> indices = new List<int>();
+			float[] chunkVox = new float[voxels.Length];
+			for(int i = 0; i< voxels.Length; i++){
+				chunkVox[i] = voxels[i].value;
+			}
 
             //The mesh produced is not optimal. There is one vert for each index.
             //Would need to weld vertices for better quality mesh.
-            marching.Generate(voxels, width, height, length, verts, indices);
+            marching.Generate(chunkVox, width, height, length, verts, indices);
 
             //A mesh in unity can only be made up of 65000 verts.
             //Need to split the verts between multiple meshes.
@@ -118,6 +126,8 @@ namespace MarchingCubesProject
             //         }
             //     }
 				// List<int> splitIndices = new List<int>();
+				List<List<int>> subIndices = new List<List<int>>();
+				subIndices.Add(indices);
 				for(int i = 0; i< verts.Count; i++){
 					verts[i] *=scale;
 				}
@@ -128,19 +138,20 @@ namespace MarchingCubesProject
 					foreach(Transform child in transform){
 						Destroy(child.gameObject);
 					}
-					Mesh mesh = new Mesh();
-					mesh.SetVertices(verts);
-					mesh.SetTriangles(indices, 0);
-					mesh.RecalculateBounds();
-					mesh.RecalculateNormals();
+					GameObject go =meshGeneration.genMesh(verts,subIndices,m_materials,transform);
+					// Mesh mesh = new Mesh();
+					// mesh.SetVertices(verts);
+					// mesh.SetTriangles(indices, 0);
+					// mesh.RecalculateBounds();
+					// mesh.RecalculateNormals();
 
-					GameObject go = new GameObject("Mesh");
-					go.transform.parent = transform;
-					go.AddComponent<MeshFilter>();
-					go.AddComponent<MeshRenderer>();
-					go.GetComponent<Renderer>().material = m_material;
-					go.GetComponent<MeshFilter>().mesh = mesh;
-					go.AddComponent<MeshCollider>();
+					// GameObject go = new GameObject("Mesh");
+					// go.transform.parent = transform;
+					// go.AddComponent<MeshFilter>();
+					// go.AddComponent<MeshRenderer>();
+					// go.GetComponent<Renderer>().material = m_material;
+					// go.GetComponent<MeshFilter>().mesh = mesh;
+					// go.AddComponent<MeshCollider>();
 
 					meshes.Add(go);
 				};
@@ -179,7 +190,7 @@ namespace MarchingCubesProject
 									int idx = x+ y*width + z*width*height;
 									if(x>0 && y> 0 && z > 0 && x<width-1 && y < height-1 && z < length-1){
 										float distancevox = Vector3.Distance(pos,new Vector3(x,y,z));
-										voxels[idx] = Mathf.Clamp(voxels[idx]-Mathf.Max(0.02f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi,-1,1);
+										voxels[idx] = new Voxel(Mathf.Clamp(voxels[idx].value-Mathf.Max(0.02f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi,-1,1),0);
 									}
 								}
 							}	
@@ -198,11 +209,18 @@ namespace MarchingCubesProject
 				//ScriptableObject.CreateInstance("VoxelObject");
 				//t = new Thread(Generate);
 				//t.Start();
-				voxelObject.voxels = voxels;
+				// voxelObject.voxels = voxels;
+				// voxelObject.vSize = new Vector3Int(width, height, length);
+				// EditorUtility.SetDirty(voxelObject);
+				string text = JsonUtility.ToJson(new VoxelObj(new Vector3Int(width, height, length),voxels));
+				File.WriteAllText(AssetDatabase.GetAssetPath(textAsset), text);
+ 				EditorUtility.SetDirty(textAsset);
+				Debug.Log(text);
 			}
 			if(Input.GetKeyDown("h")){
 				//ScriptableObject.CreateInstance("VoxelObject");
-				voxels = voxelObject.voxels;
+				VoxelObj vO = JsonUtility.FromJson<VoxelObj>(File.ReadAllText(AssetDatabase.GetAssetPath(textAsset)));
+				voxels = vO.voxels;
 				t = new Thread(Generate);
 				t.Start();
 				

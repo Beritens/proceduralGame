@@ -6,15 +6,13 @@ using System.Threading;
 
 public class sculpting{
 
-	Camera cam;
     int chunkSize;
     int voxelsPerChunk;
     float resolution;
     int overlap;
     int cS;
     float max;
-    public sculpting(Camera cam, int chunkSize, int voxelsPerChunk, int overlap, float max){
-        this.cam = cam;
+    public sculpting(int chunkSize, int voxelsPerChunk, int overlap, float max){
         this.chunkSize = chunkSize;
         this.voxelsPerChunk = voxelsPerChunk;
         this.overlap = overlap;
@@ -65,9 +63,9 @@ public class sculpting{
                                     float newMaxL = Mathf.Min(-max,original.value);
                                     float newMaxH = Mathf.Max(max,original.value);
                                     //Debug.Log(newMax);
-                                    float vox = Mathf.Clamp(original.value+change,-1,1);
+                                    float vox = Mathf.Clamp(original.value+change,newMaxL,newMaxH);
 
-                                    vox = Mathf.Clamp(vox,newMaxL,newMaxH);
+                                    //vox = Mathf.Clamp(vox,newMaxL,newMaxH);
                                     if( (change < 0 || nearPlayer)  && (original.value > 0.05f)){
                                         mat = material;
                                     }
@@ -197,8 +195,8 @@ public class sculpting{
             int mat = original.material;
             float newMaxL = Mathf.Min(-max,original.value);
             float newMaxH = Mathf.Max(max,original.value);
-            float vox=  Mathf.Clamp(original.value+change,-1,1);
-            vox = Mathf.Clamp(vox,newMaxL,newMaxH);
+            float vox=  Mathf.Clamp(original.value+change,newMaxL,newMaxH);
+            //vox = Mathf.Clamp(vox,newMaxL,newMaxH);
             if( (change < 0 || nearPlayer)  && (original.value > 0.05f)){
                 mat = material;
             }
@@ -210,4 +208,86 @@ public class sculpting{
     public Vector3Int Chunk(Vector3 pos){
         return new Vector3Int(Mathf.FloorToInt(pos.x/(chunkSize/*-overlap/*2*/)),Mathf.FloorToInt(pos.y/(chunkSize/*-overlap/*2*/)),Mathf.FloorToInt(pos.z/(chunkSize/*-overlap/*2*/)));
     }
+    
+}
+public class sculptingObj{
+    // public sculptingObj(Camera cam, int chunkSize, int voxelsPerChunk, int overlap, float max){
+    //     this.cam = cam;
+    //     this.chunkSize = chunkSize;
+    //     this.voxelsPerChunk = voxelsPerChunk;
+    //     this.overlap = overlap;
+    //     this.resolution = (float)voxelsPerChunk/chunkSize;
+    //     this.cS = (int)((float)chunkSize*resolution)+overlap;
+    //     this.max = max;
+    // }
+
+    // must use local position
+    public static void sculpt(ref Voxel[] voxels, Vector3 pos, float resolution, Vector3Int vS){
+        
+        
+                    //Debug.Log(chunk);
+                    //pos = pos- hit.normal;
+                    int _x = Mathf.FloorToInt((pos.x)*resolution);
+                    
+                    int _y = Mathf.FloorToInt((pos.y)*resolution);
+                    int _z = Mathf.FloorToInt((pos.z)*resolution);
+                    int changeDis = 2;
+                    //Debug.Log(pos);
+                    //int idx = x+ y*chunkSize + z*chunkSize*chunkSize;
+                    for(int x = _x-changeDis; x<= _x+changeDis; x++){
+                        for(int y = _y-changeDis; y<= _y+changeDis; y++){
+                            for(int z = _z-changeDis; z<= _z+changeDis; z++){
+                                
+                                float distancevox = Vector3.Distance(pos,new Vector3(x,y,z)/resolution);
+                                
+                                
+                                //float factor = Mathf.Clamp((distanceplayer-0.5f)/3f,0,1);
+                                bool nearPlayer = false;
+                                
+                                float change = Mathf.Max(0.02f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0);
+                                
+                                if(!(x<0 || y<0 || z<0 || x>=vS.x || y>=vS.y || z>=vS.z)){
+                                    int idx = x+ y*vS.x + z*vS.x*vS.y;
+                                    
+                                    Voxel original = voxels[idx];
+                                    int mat = original.material;
+                                    //float newMaxL = Mathf.Min(-max,original.value);
+                                    //float newMaxH = Mathf.Max(max,original.value);
+                                    //Debug.Log(newMax);
+                                    float vox = Mathf.Clamp(original.value+change,-1,1);
+
+                                    vox = Mathf.Clamp(vox,-1,1);
+                                    // if( (change < 0 || nearPlayer)  && (original.value > 0.05f)){
+                                    //     mat = material;
+                                    // }
+                                    
+                                    //clamp -1 and 1 maybe
+                                    //Debug.Log(Mathf.Max(0.05f*(-0.1f*Mathf.Pow(distancevox,2)+1f)+100f,0));
+                                    voxels[idx] = new Voxel(vox,mat);
+                                    
+                                    
+                            }
+                        }	
+                    }
+                
+                    /*if(voxels.chunkSize > idx && idx>= 0)
+                        voxels[idx] -= 1f;	*/			
+                        
+                    
+                    //Thread t = new Thread(() => GTL(chunks));
+                    //t.Start();
+                    //cansculpt = false;
+                }
+                
+            
+    }
+    
+
+    // void GTL(List<Vector3Int> chunks){
+    //     for(int i = 0; i< chunks.Count; i++){
+    //         GenerateTerrain(chunks[i]);
+    //     }
+    // }
+    
+    
 }
