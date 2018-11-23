@@ -21,6 +21,7 @@ using ProceduralNoiseProject;
         
 
         public MARCHING_MODE mode = MARCHING_MODE.CUBES;
+        
 
         public int seed = 0;
         public int chunkSize = 32;
@@ -37,7 +38,6 @@ using ProceduralNoiseProject;
 
         //List<GameObject> meshes = new List<GameObject>();
         Dictionary<Vector3Int,GameObject> meshes = new Dictionary<Vector3Int, GameObject>();
-        FractalNoise fractal;
         List<Vector3Int> generatedChunks = new List<Vector3Int>();
         Vector3Int lastPlayerChunk;
         List<Action> FunctionsToRunInMainThread = new List<Action>();
@@ -50,9 +50,13 @@ using ProceduralNoiseProject;
         //public Color[] colors;
         [Space(10)]
         [Header("sculpt stuff")]
+        public float sculptStrength = 1f;
         public sculpting sculp;
         voxGeneration generation;
-        
+        // [Space(10)]
+        // [Header("object stuff")]
+        // public float spawnProbability;
+        // public spawnObject spawnObject;
     
         void Start()
         {
@@ -85,24 +89,11 @@ using ProceduralNoiseProject;
                 marching = new MarchingCubes();
             
             marching.Surface = surface;  
-            
-            
-            //float s = (int)((float)scale*resolution);
-            
-            
 
-            //Set the mode used to create the mesh.
-            //Cubes is faster and creates less verts, tetrahedrons is slower and creates more verts but better represents the mesh surface.
-            
-            //Surface is the value that represents the surface of mesh
-            //For example the perlin noise has a range of -1 to 1 so the mid point is where we want the surface to cut through.
-            //The target value does not have to be the mid point it can be any value with in the range.
-            
-
-            //The size of voxel array.
+            // bool newChunk = false;
             Voxel[] chunkVoxels;
             if(!voxels.ContainsKey(terrainOffset)){
-                
+                //newChunk = true;
                 chunkVoxels = generation.Voxels(/*,s*/terrainOffset);
                 voxels.Add(terrainOffset,chunkVoxels);
             }
@@ -120,6 +111,7 @@ using ProceduralNoiseProject;
 
             List<Vector3> verts = new List<Vector3>();
             List<int> indices = new List<int>();
+            
 
             //The mesh produced is not optimal. There is one vert for each index.
             //Would need to weld vertices for better quality mesh.
@@ -130,14 +122,23 @@ using ProceduralNoiseProject;
             for(int i = 0; i< m_materials.Count; i++){
                 subIndices.Add(new List<int>());
             }
+            //System.Random random = new System.Random();
+            //spawnObject.spawn(terrainOffset,terrainOffset,-1);
             for(int i = 0; i< indices.Count; i = i+3){
                 //bool normal = true;
+                
                 Vector3 triPos = (verts[indices[i]]+verts[indices[i+1]]+verts[indices[i+2]])/3;
                 Vector3Int voxeloV = Vector3Int.RoundToInt(triPos);
                 int idx = voxeloV.x + voxeloV.y*cS + voxeloV.z*cS*cS;
-                subIndices[chunkVoxels[idx].material].Add(indices[i]);
-                subIndices[chunkVoxels[idx].material].Add(indices[i+1]);
-                subIndices[chunkVoxels[idx].material].Add(indices[i+2]);
+                int mat =chunkVoxels[idx].material; 
+                subIndices[mat].Add(indices[i]);
+                subIndices[mat].Add(indices[i+1]);
+                subIndices[mat].Add(indices[i+2]);
+                //System.Random random = new System.Random();
+                
+                // if(newChunk && random.NextDouble() < spawnProbability){
+                //  spawnObject.spawn(triPos+terrainOffset,terrainOffset,-1);
+                // }// spawn objects
                 
             }
             for(int i = 0; i< verts.Count; i++){
@@ -254,6 +255,8 @@ using ProceduralNoiseProject;
 
         }
         Thread Sthread;
+        float plusStrength = 0;
+        
         void sculpt(){
             if(Cursor.lockState == CursorLockMode.None){
                 return;
@@ -288,14 +291,19 @@ using ProceduralNoiseProject;
                             Material material = collider.GetComponent<MeshRenderer>().sharedMaterials[submesh];
                             submesh = m_materials.IndexOf(material);
                         }
+                        float t = Time.deltaTime+plusStrength;
                         
-                        Sthread = new Thread(() => GTL(sculp.sculpt(ref voxels,multi,pos,playerPos,submesh)));
+                        Sthread = new Thread(() => GTL(sculp.sculpt(ref voxels,multi,pos,playerPos,submesh,t)));
                         
-                        Sthread.Start();	
+                        Sthread.Start();
+                        plusStrength = 0;
                               
 					}
 				}
 			}
+            else if(Sthread != null && Sthread.IsAlive){
+                plusStrength += Time.deltaTime;
+            }
         }
 
         public void GTL(List<Vector3Int> chunks){
@@ -369,7 +377,7 @@ using ProceduralNoiseProject;
                 seed = UnityEngine.Random.Range(-1000000,1000000);
                 INoise perlin = new PerlinNoise(seed, 2/scale/resolution);
                 //fractal = new FractalNoise(perlin, 3, 1.0f);
-                fractal = new FractalNoise(perlin, fractalOctaves, fractalfrequency, fractalamplitude);
+                //fractal = new FractalNoise(perlin, fractalOctaves, fractalfrequency, fractalamplitude);
                 print("hello");
             }
             generatedChunks = new List<Vector3Int>();
@@ -384,16 +392,6 @@ using ProceduralNoiseProject;
                 return;
             }
             seed = int.Parse(_seed);
-            INoise perlin = new PerlinNoise(seed, 2/scale/resolution);
-            //fractal = new FractalNoise(perlin, 3, 1.0f);
-            fractal = new FractalNoise(perlin, fractalOctaves, fractalfrequency, fractalamplitude);
-            //biomes.seed = seed;
-        }
-        public void changeScale(float newScale){
-            scale = newScale;
-            INoise perlin = new PerlinNoise(seed, 2/scale/resolution);
-            //fractal = new FractalNoise(perlin, 3, 1.0f);
-            fractal = new FractalNoise(perlin, fractalOctaves, fractalfrequency, fractalamplitude);
         }
         public void changeResolution(float newResolution){
             voxelsPerChunk= (int)newResolution;
@@ -402,11 +400,6 @@ using ProceduralNoiseProject;
             sculp = new sculpting(chunkSize,voxelsPerChunk,overlap,0.4f);
         }
         #endregion
-        [Space(10)]
-        [Header("fractal stuff")]
-        public int fractalOctaves = 2;
-        public float fractalfrequency = 1f;
-        public float fractalamplitude = 1f;
 
 
     }

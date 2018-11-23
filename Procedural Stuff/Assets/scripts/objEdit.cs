@@ -75,7 +75,7 @@ namespace MarchingCubesProject
 						{
 							float voxel = 0;
 							float distance = Vector3.Distance(new Vector3(x+0.5f,y+0.5f,z+0.5f),new Vector3((float)width/2,(float)height/2,(float)length/2));
-							voxel = -((0.7f/distance)*2-1);
+							voxel = -Mathf.Clamp(((0.7f/distance)*2-1),-0.3f,0.3f);
 							float fx = x;
 							float fy = y;
 							float fz = z;
@@ -190,7 +190,7 @@ namespace MarchingCubesProject
 									int idx = x+ y*width + z*width*height;
 									if(x>0 && y> 0 && z > 0 && x<width-1 && y < height-1 && z < length-1){
 										float distancevox = Vector3.Distance(pos,new Vector3(x,y,z));
-										voxels[idx] = new Voxel(Mathf.Clamp(voxels[idx].value-Mathf.Max(0.02f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi,-1,1),0);
+										voxels[idx] = new Voxel(Mathf.Clamp(voxels[idx].value-Mathf.Max(0.08f*(-0.5f*Mathf.Pow(distancevox,2)+1f),0)*multi,-0.3f,0.3f),0);
 									}
 								}
 							}	
@@ -205,6 +205,7 @@ namespace MarchingCubesProject
 					}
 				}
 			}
+			#if UNITY_EDITOR
 			if(Input.GetKeyDown("g")){
 				//ScriptableObject.CreateInstance("VoxelObject");
 				//t = new Thread(Generate);
@@ -225,6 +226,7 @@ namespace MarchingCubesProject
 				t.Start();
 				
 			}
+			#endif
         }
 
     }

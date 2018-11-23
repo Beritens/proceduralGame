@@ -10,6 +10,7 @@ public class voxGeneration : MonoBehaviour {
 	int cS;
 	float resolution;
     FastNoise noise = new FastNoise();
+    FastNoise MountainNoise = new FastNoise();
 	
 	public voxGeneration(/* FractalNoise fractal,*/ int cS,float resolution, int seed, float frequency){
 		//this.fractal = fractal;
@@ -22,6 +23,11 @@ public class voxGeneration : MonoBehaviour {
         noise.SetFractalOctaves(2);
         noise.SetSeed(seed);
         noise.SetFrequency(frequency);
+
+        //mountain
+        MountainNoise.SetNoiseType(FastNoise.NoiseType.PerlinFractal);
+        MountainNoise.SetFractalOctaves(2);
+        MountainNoise.SetFrequency(0.1f);
     }
 
 	
@@ -54,16 +60,15 @@ public class voxGeneration : MonoBehaviour {
         
         
         Voxel Voxel(int x, int y, int z, Vector3Int offset, Vector3 newOffset){
-            Vector3 scaly = Vector3.one;
             //different scale
             // if(y + Offset.y < -50){
             //     //Debug.Log((y + _offset.y+ 50)*0.1f);
             //     scaly = scaly+(-(y + newOffset.y) - 50)*0.001f;
             // }
             
-            float fx = (x+newOffset.x) / (2f * scaly.x);
-            float fy = (y+newOffset.y) / (2f * scaly.y);
-            float fz = (z+newOffset.z) / (2f * scaly.z);
+            float fx = (x+newOffset.x) / (2f);
+            float fy = (y+newOffset.y) / (2f);
+            float fz = (z+newOffset.z) / (2f);
 
             //float vox = fractal.Sample3D(fx, fy, fz);
             float vox = noise.GetNoise(fx,fy,fz);
@@ -73,30 +78,32 @@ public class voxGeneration : MonoBehaviour {
             //     vox = Mathf.Clamp(vox+0.5f,-1,1);
             // }
 
-            //vox= Mathf.Clamp(vox+0.5f,-1,1); //less caves
+            //vox-=0.2f; //less caves
             float posy = y/resolution + offset.y;
             if(posy > 5){
-                // voxels[idx] = Mathf.Clamp(voxels[idx]-(y +newOffset.y -5)*0.1f,-1,1);
-                // float iks = y +newOffset.y -5;
-                // voxels[idx] = Mathf.Clamp(voxels[idx]-(0.1f*Mathf.Pow(2,iks)),-1,1);
-                //bool b = fractal.Sample2D(x/1f,z/1f)>0;
                 mat =1;
                 float iks = posy -5;
-                vox = Mathf.Clamp(vox+(Mathf.Pow(iks,2)*0.01f),-1f,1f);
-                // if(posy > 7){
-                //     mat = 2;
-                // }
-                //vox = 1;
+
+                // float mH = 50f;
+                // float height = (MountainNoise.GetNoise(fx,fz)+0.5f)*mH;
+                // float p = iks/mH;
+                // vox = vox*(1-p) + ((iks-height)/10f)*p; //mountains
+
+                vox = /* Mathf.Clamp(*/vox+(Mathf.Pow(iks,2)*0.01f)/* ,-1f,1f)*/;
              }
             float f = noise.GetNoise(fx,fz);
-            //vox = Mathf.Clamp(vox,-0.3f,0.3f);
+            vox = Mathf.Clamp(vox,-0.3f,0.3f);
+
             if(f>0f){
                 mat += 2;
             }
+
+            // if(posy > 40){
+            //     mat = 4;
+            // }
                 
             
-            //mat = f >0 ? mat+2:mat;
-            //vox = Mathf.Sign(vox)*0.1f;//retro voxel style
+            //vox = Mathf.Sign(vox)*0.2f;//retro voxel style
             return new Voxel(vox,mat);
         }
 }
@@ -112,6 +119,7 @@ public class meshGeneration{
 				continue;
 			}
 			else{
+                Debug.Log("indices "+subIndices[i].Count);
 				mesh.subMeshCount++;
 				mesh.SetTriangles(subIndices[i], submeshIndex);
 				mats.Add(m_materials[i]);
@@ -123,13 +131,14 @@ public class meshGeneration{
 		mesh.RecalculateNormals();
 		GameObject go = new GameObject("Mesh");
 		go.transform.parent = parent;
-		go.AddComponent<MeshFilter>();
+		MeshFilter mF = go.AddComponent<MeshFilter>();
 		go.AddComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		go.GetComponent<Renderer>().materials = mats.ToArray();
-		go.GetComponent<MeshFilter>().mesh = mesh;
+		mF.mesh = mesh;
 		
-		//if(verts .Count > 100)
-        go.AddComponent<MeshCollider>();
+		//if(verts .Count > 3)
+            Debug.Log("verts "+mesh.vertexCount);
+            go.AddComponent<MeshCollider>();
 		return go;
 	}
 }

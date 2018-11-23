@@ -29,13 +29,16 @@ public class spawnObject : MonoBehaviour {
 	}
 	public void spawn(Vector3 position, Vector3Int chunk, int index){
 		VoxelObj obj;
+		Debug.Log("hello");
 		if(index >= 0){
 			
 			obj = objDict[chunk][index];
 		}
 		else{
-			VoxelObj temp = objects[UnityEngine.Random.Range(0,objects.Count)];
+			//System.Random random = new System.Random();
+			VoxelObj temp = objects[0];
 			//Debug.Log(UnityEngine.Random.Range(0,objects.Count));
+			
 			obj = new VoxelObj(temp.vSize,(Voxel[])temp.voxels.Clone());
 			//obj.voxels = temp.voxels;
 			//obj.vSize = temp.vSize;
@@ -113,11 +116,11 @@ public class spawnObject : MonoBehaviour {
 	/// Start is called on the frame when a script is enabled just before
 	/// any of the Update methods is called the first time.
 	/// </summary>
-	void Start()
-	{
-		spawn(Vector3.zero, Vector3Int.zero, -1);
-		spawn(Vector3.up*5, Vector3Int.zero, -1);
-	}
+	// void Start()
+	// {
+	// 	spawn(Vector3.zero, Vector3Int.zero, -1);
+	// 	spawn(Vector3.up*5, Vector3Int.zero, -1);
+	// }
 	void sculptObjects(){
             if(Cursor.lockState == CursorLockMode.None){
                 return;

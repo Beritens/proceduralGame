@@ -20,7 +20,7 @@ public class sculpting{
         this.cS = (int)((float)chunkSize*resolution)+overlap;
         this.max = max;
     }
-    public List<Vector3Int> sculpt(ref Dictionary<Vector3Int,Voxel[]> voxels, int multi,Vector3 pos, Vector3 playerPos, int material){
+    public List<Vector3Int> sculpt(ref Dictionary<Vector3Int,Voxel[]> voxels, int multi,Vector3 pos, Vector3 playerPos, int material,float sculptMulti){
         
         
                 Vector3Int chunk= Chunk(pos)*(chunkSize/*-overlap/*2*/);
@@ -45,7 +45,7 @@ public class sculpting{
                                 //float factor = Mathf.Clamp((distanceplayer-0.5f)/3f,0,1);
                                 bool nearPlayer = false;
                                 
-                                float change = Mathf.Max(0.02f*(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi;
+                                float change = Mathf.Max(/* 0.02f**/(-0.05f*Mathf.Pow(distancevox,2)+1f),0)*multi*sculptMulti;
                                 if( multi == -1){
                                     float distanceplayer = Vector3.Distance(new Vector3(x,y,z)/resolution+chunk,playerPos);
                                     if(distanceplayer<2f){
