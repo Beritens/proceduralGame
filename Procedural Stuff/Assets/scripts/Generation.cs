@@ -4,7 +4,7 @@ using UnityEngine;
 using ProceduralNoiseProject;
 using System.Linq;
 
-public class voxGeneration : MonoBehaviour {
+public class voxGeneration{
 	
 	//FractalNoise fractal;
 	int cS;
@@ -19,19 +19,19 @@ public class voxGeneration : MonoBehaviour {
         SetNoise(seed, frequency);
 	}
     public void SetNoise(int seed, float frequency){
-        noise.SetNoiseType(FastNoise.NoiseType.PerlinFractal);
+        noise.SetNoiseType(FastNoise.NoiseType.SimplexFractal);
         noise.SetFractalOctaves(2);
         noise.SetSeed(seed);
         noise.SetFrequency(frequency);
 
         //mountain
-        MountainNoise.SetNoiseType(FastNoise.NoiseType.PerlinFractal);
+        MountainNoise.SetNoiseType(FastNoise.NoiseType.SimplexFractal);
         MountainNoise.SetFractalOctaves(2);
-        MountainNoise.SetFrequency(0.1f);
+        MountainNoise.SetFrequency(0.06f);
     }
-
+    
 	
-	public Voxel[] Voxels(/*, float _scale*/ Vector3Int _offset){
+	public Voxel[] Voxels(/*, float _scale*/ Vector3Int _offset, List<orePoint> ores){
             //The size of voxel array.
             Vector3 v = _offset;
             Vector3 newOffset = v*resolution;
@@ -46,7 +46,7 @@ public class voxGeneration : MonoBehaviour {
                     {
 
                         int idx = x + y * cS + z * cS * cS;
-                        voxs[idx] = Voxel(x,y,z,_offset,newOffset);
+                        voxs[idx] = Voxel(x,y,z,_offset,newOffset, ores);
                         
                         
                     }
@@ -59,7 +59,7 @@ public class voxGeneration : MonoBehaviour {
         
         
         
-        Voxel Voxel(int x, int y, int z, Vector3Int offset, Vector3 newOffset){
+        Voxel Voxel(int x, int y, int z, Vector3Int offset, Vector3 newOffset, List<orePoint> ores){
             //different scale
             // if(y + Offset.y < -50){
             //     //Debug.Log((y + _offset.y+ 50)*0.1f);
@@ -74,29 +74,45 @@ public class voxGeneration : MonoBehaviour {
             float vox = noise.GetNoise(fx,fy,fz);
             //Debug.Log(vox);
             int mat = 0;
+            bool matchanged = false;
+            Vector3 truepos = new Vector3(x/resolution+offset.x,y/resolution+offset.y,z/resolution+offset.z);
+            for(int i = 0; i< ores.Count; i++){
+                if(Vector3.Distance(ores[i].position,truepos)< ores[i].radius){
+                    mat = ores[i].material;
+                    matchanged = true;
+                }
+            }
             // if(biomes.GetBiomData(new Vector3(x,y,z)/resolution+offset).biom[0] != 4){
             //     vox = Mathf.Clamp(vox+0.5f,-1,1);
             // }
 
             //vox-=0.2f; //less caves
-            float posy = y/resolution + offset.y;
+            float posy = truepos.y;
             if(posy > 5){
-                mat =1;
+                if(!matchanged)
+                    mat =1;
                 float iks = posy -5;
 
-                // float mH = 50f;
-                // float height = (MountainNoise.GetNoise(fx,fz)+0.5f)*mH;
-                // float p = iks/mH;
-                // vox = vox*(1-p) + ((iks-height)/10f)*p; //mountains
+                float mH = 20f;
+                float height = (MountainNoise.GetNoise(fx,fz)+1f)*mH;
+                float p = iks/(mH*2);
+                vox = vox*(1-p) + ((iks-height)/mH)*p; //mountains
 
-                vox = /* Mathf.Clamp(*/vox+(Mathf.Pow(iks,2)*0.01f)/* ,-1f,1f)*/;
+                //vox = /* Mathf.Clamp(*/vox+(Mathf.Pow(iks,2)*0.01f)/* ,-1f,1f)*/;
              }
-            float f = noise.GetNoise(fx,fz);
+            
+            //vox = (posy-(((x+newOffset.x)*0.5f *((z+newOffset.z)*0.5f))))/20f;
+            //vox = (posy-(x+newOffset.x))/20;
+            //vox = posy-5;
             vox = Mathf.Clamp(vox,-0.3f,0.3f);
-
-            if(f>0f){
-                mat += 2;
+            
+            if(!matchanged){
+                float f = noise.GetNoise(fx,fz);
+                if(f>0f){
+                    mat += 2;
+                }
             }
+            
 
             // if(posy > 40){
             //     mat = 4;
@@ -119,7 +135,6 @@ public class meshGeneration{
 				continue;
 			}
 			else{
-                Debug.Log("indices "+subIndices[i].Count);
 				mesh.subMeshCount++;
 				mesh.SetTriangles(subIndices[i], submeshIndex);
 				mats.Add(m_materials[i]);
@@ -135,10 +150,8 @@ public class meshGeneration{
 		go.AddComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 		go.GetComponent<Renderer>().materials = mats.ToArray();
 		mF.mesh = mesh;
-		
-		//if(verts .Count > 3)
-            Debug.Log("verts "+mesh.vertexCount);
-            go.AddComponent<MeshCollider>();
+        go.AddComponent<MeshCollider>();
 		return go;
 	}
+    
 }
